@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm install *)",
+      "Bash(node -e \"const {DatabaseSync} = require\\('node:sqlite'\\); console.log\\('node:sqlite OK'\\)\")"
+    ]
+  }
+}

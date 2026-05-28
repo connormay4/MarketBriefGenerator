@@ -1,0 +1,49 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-stone-50 text-stone-900;
+  }
+}
+
+/* Print stylesheet for PDF export */
+@media print {
+  .no-print { display: none !important; }
+  .print-break { page-break-after: always; }
+  body { background: white; }
+  .brief-content { max-width: 100% !important; }
+}
+
+/* Markdown styles inside brief */
+.brief-content h2 {
+  @apply text-xl font-bold mt-6 mb-3 border-b border-stone-300 pb-1;
+}
+.brief-content h3 {
+  @apply text-lg font-semibold mt-4 mb-2;
+}
+.brief-content ul {
+  @apply list-disc pl-5 space-y-1;
+}
+.brief-content ol {
+  @apply list-decimal pl-5 space-y-1;
+}
+.brief-content p {
+  @apply mb-3 leading-relaxed;
+}
+.brief-content strong {
+  @apply font-semibold text-stone-900;
+}
+.brief-content table {
+  @apply w-full border-collapse text-sm my-4;
+}
+.brief-content th {
+  @apply bg-stone-100 border border-stone-300 px-3 py-2 text-left font-semibold;
+}
+.brief-content td {
+  @apply border border-stone-300 px-3 py-2;
+}
+.brief-content tr:nth-child(even) td {
+  @apply bg-stone-50;
+}
