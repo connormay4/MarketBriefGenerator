@@ -70,7 +70,10 @@ async function searchCompetitorNews(name, location) {
     contents: prompt,
     config: {
       // No output token cap — let the model decide length (prompt still asks
-      // for a short bullet list).
+      // for a short bullet list). Disable "thinking" — this is a retrieval
+      // task that doesn't need internal reasoning, and thinking was the main
+      // source of multi-minute latency.
+      thinkingConfig: { thinkingBudget: 0 },
       tools: [{ googleSearch: {} }], // Gemini's web-search grounding
     }
   }), `news:${name}`);
