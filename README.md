@@ -1,6 +1,6 @@
 # CFA Market Intel — Competitor Research Tool
 
-An on-demand competitive intelligence tool for Chick-fil-A franchise owners. Pulls live Google Places data and uses Claude AI with web search to generate a clean 5-minute competitive brief.
+An on-demand competitive intelligence tool for Chick-fil-A franchise owners. Pulls live Google Places data and uses Google Gemini with web search to generate a clean 5-minute competitive brief.
 
 
 ## Quick Start
@@ -19,7 +19,7 @@ cp .env.example .env
 
 Edit `.env`:
 ```
-ANTHROPIC_API_KEY=sk-ant-...
+GEMINI_API_KEY=AIza...
 GOOGLE_PLACES_API_KEY=AIza...
 LOCATION="Atlanta, GA 30301"
 PORT=3001
@@ -50,11 +50,13 @@ Open **http://localhost:3000** — click **Generate New Brief**.
 
 **Cost note:** The Places Text Search costs ~$0.017/request and Details costs ~$0.017/request. A full brief generation makes ~10 Places calls total — about $0.17 per brief.
 
-### Anthropic API Key
+### Gemini API Key
 
-1. Go to [console.anthropic.com](https://console.anthropic.com)
-2. Create an API key
-3. Paste into `.env` as `ANTHROPIC_API_KEY`
+1. Go to [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
+2. Create an API key (Google AI Studio)
+3. Paste into `.env` as `GEMINI_API_KEY`
+
+The pipeline uses the `gemini-3.5-flash` model with Google Search grounding for the news/promotions step. The model ID is set in one place — `MODEL` at the top of `server/services/research.js`. If the API rejects it, switch to `gemini-flash-latest` or `gemini-2.5-flash`.
 
 ---
 
@@ -77,7 +79,7 @@ If the wrong location appears (e.g., it finds a location across town instead of 
 /client         React + Tailwind frontend (Vite)
 /server         Express API + research pipeline
   /routes       REST endpoints (briefs, settings)
-  /services     Google Places fetcher, Claude research pipeline
+  /services     Google Places fetcher, Gemini research pipeline
 /data           SQLite database (auto-created on first run)
 .env.example    Environment variable template
 ```
@@ -90,8 +92,8 @@ If the wrong location appears (e.g., it finds a location across town instead of 
 4. Click **Generate New Brief**
 5. Watch the 3-step progress indicator as it:
    - Fetches ratings from Google Places (~5 competitors)
-   - Searches news/promotions via Claude web search
-   - Synthesizes the brief with Claude
+   - Searches news/promotions via Gemini + Google Search grounding
+   - Synthesizes the brief with Gemini
 6. Read the brief — Recommendations section is expanded first
 
 ## Settings

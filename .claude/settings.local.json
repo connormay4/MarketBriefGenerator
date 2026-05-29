@@ -4,7 +4,16 @@
       "Bash(npm install *)",
       "Bash(node -e \"const {DatabaseSync} = require\\('node:sqlite'\\); console.log\\('node:sqlite OK'\\)\")",
       "Bash(git credential *)",
-      "Bash(python3 -c \"import sys,json; prs=json.load\\(sys.stdin\\); print\\(prs[0]['html_url'] if prs else 'none'\\)\")"
+      "Bash(python3 -c \"import sys,json; prs=json.load\\(sys.stdin\\); print\\(prs[0]['html_url'] if prs else 'none'\\)\")",
+      "Bash(npm uninstall *)",
+      "Bash(node --env-file=.env -e \"require\\('./server/services/research.js'\\); console.log\\('OK after uninstall'\\)\")",
+      "Bash(node --env-file=.env -e ' *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git checkout *)",
+      "Bash(git pull *)",
+      "Bash(git merge *)"
     ]
   },
   "hooks": {

@@ -1,10 +1,25 @@
-const Anthropic = require('@anthropic-ai/sdk');
+const { GoogleGenAI } = require('@google/genai');
 const { fetchCompetitorData } = require('./places');
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+function getApiKey() {
+  const key = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+  if (!key || key.startsWith('your_')) {
+    throw new Error('GEMINI_API_KEY is not configured. Add a valid Google AI Studio key to your .env file.');
+  }
+  return key;
+}
 
-// Single source of truth for the Claude model used across the pipeline.
-const MODEL = 'claude-haiku-4-5-20251001';
+// Lazily construct the client so a missing key fails at generation time
+// (with a clear message) rather than crashing server boot.
+let _ai = null;
+function getClient() {
+  if (!_ai) _ai = new GoogleGenAI({ apiKey: getApiKey() });
+  return _ai;
+}
+
+// Single source of truth for the Gemini model used across the pipeline.
+// If the API rejects this ID, try 'gemini-flash-latest' or 'gemini-2.5-flash'.
+const MODEL = 'gemini-3.5-flash';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
@@ -29,8 +44,9 @@ async function withRetry(fn, label, maxAttempts = 3) {
     try {
       return await fn();
     } catch (err) {
-      const is429 = err?.status === 429 || err?.message?.includes('rate_limit');
-      const is5xx = err?.status >= 500;
+      const msg = err?.message ?? '';
+      const is429 = err?.status === 429 || msg.includes('rate_limit') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('429');
+      const is5xx = err?.status >= 500 || msg.includes('UNAVAILABLE') || msg.includes('500') || msg.includes('503');
       if ((is429 || is5xx) && attempt < maxAttempts) {
         console.warn(`[retry] ${label} — attempt ${attempt} failed (${err.status ?? err.message}), retrying in ${delay / 1000}s`);
         await new Promise(r => setTimeout(r, delay));
@@ -45,27 +61,20 @@ async function withRetry(fn, label, maxAttempts = 3) {
 // ─── Step B: news search ──────────────────────────────────────────────────────
 
 async function searchCompetitorNews(name, location) {
-  const messages = [
-    {
-      role: 'user',
-      content: `Search for news about ${name} near ${location}. Return ONLY a markdown bullet list, max 5 bullets, each under 25 words. Cover: active promos/LTOs, new menu items, local openings/closures, national news affecting traffic. No intros or explanations.`
-    }
-  ];
+  const prompt = `Search for news about ${name} near ${location}. Return ONLY a markdown bullet list, max 5 bullets, each under 25 words. Cover: active promos/LTOs, new menu items, local openings/closures, national news affecting traffic. No intros or explanations.`;
 
-  console.log(`[news] ${name} — prompt ~${estimateTokens(messages[0].content.text ?? messages[0].content)} tokens`);
+  console.log(`[news] ${name} — prompt ~${estimateTokens(prompt)} tokens`);
 
-  const response = await withRetry(() => client.messages.create({
+  const response = await withRetry(() => getClient().models.generateContent({
     model: MODEL,
-    max_tokens: 300, // tight cap — we only want a short bullet list
-    tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-    messages
+    contents: prompt,
+    config: {
+      maxOutputTokens: 300, // tight cap — we only want a short bullet list
+      tools: [{ googleSearch: {} }], // Gemini's web-search grounding
+    }
   }), `news:${name}`);
 
-  const text = response.content
-    .filter(b => b.type === 'text')
-    .map(b => b.text)
-    .join('\n')
-    .trim();
+  const text = (response.text ?? '').trim();
 
   // Hard cap the output before it enters the synthesis prompt
   const capped = truncate(text || 'No recent news found.', 500);
@@ -123,13 +132,15 @@ async function synthesizeBrief({ competitorData, newsData, location, sections })
   const tokenEstimate = estimateTokens(prompt);
   console.log(`[synthesis] prompt ~${tokenEstimate} tokens`);
 
-  const response = await withRetry(() => client.messages.create({
+  const response = await withRetry(() => getClient().models.generateContent({
     model: MODEL,
-    max_tokens: 1024, // down from 2048 — brief output only
-    messages: [{ role: 'user', content: prompt }]
+    contents: prompt,
+    config: {
+      maxOutputTokens: 1024, // brief output only
+    }
   }), 'synthesis');
 
-  return response.content[0].text;
+  return response.text;
 }
 
 // ─── Pipeline ─────────────────────────────────────────────────────────────────
