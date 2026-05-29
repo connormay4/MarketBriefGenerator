@@ -79,7 +79,7 @@ If the wrong location appears (e.g., it finds a location across town instead of 
 /client         React + Tailwind frontend (Vite)
 /server         Express API + research pipeline
   /routes       REST endpoints (briefs, settings)
-  /services     Google Places fetcher, Claude research pipeline
+  /services     Google Places fetcher, Gemini research pipeline
 /data           SQLite database (auto-created on first run)
 .env.example    Environment variable template
 ```
