@@ -50,11 +50,13 @@ Open **http://localhost:3000** — click **Generate New Brief**.
 
 **Cost note:** The Places Text Search costs ~$0.017/request and Details costs ~$0.017/request. A full brief generation makes ~10 Places calls total — about $0.17 per brief.
 
-### Anthropic API Key
+### Gemini API Key
 
-1. Go to [console.anthropic.com](https://console.anthropic.com)
-2. Create an API key
-3. Paste into `.env` as `ANTHROPIC_API_KEY`
+1. Go to [aistudio.google.com/apikey](https://aistudio.google.com/apikey)
+2. Create an API key (Google AI Studio)
+3. Paste into `.env` as `GEMINI_API_KEY`
+
+The pipeline uses the `gemini-3.5-flash` model with Google Search grounding for the news/promotions step. The model ID is set in one place — `MODEL` at the top of `server/services/research.js`. If the API rejects it, switch to `gemini-flash-latest` or `gemini-2.5-flash`.
 
 ---
 
