@@ -154,12 +154,7 @@ async function synthesizeBrief({ competitorData, newsData, location, sections })
   const response = await withRetry(() => getClient().models.generateContent({
     model: MODEL,
     contents: prompt,
-    config: {
-      // The full 3-section brief runs ~600-900 tokens of prose; Flash also
-      // consumes output budget on internal "thinking" tokens. 1024 was cutting
-      // the brief off mid-sentence — give generous headroom.
-      maxOutputTokens: 4096,
-    }
+    // No output token cap — let the model write the full brief unconstrained.
   }), 'synthesis');
 
   return response.text;
