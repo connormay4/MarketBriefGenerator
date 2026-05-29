@@ -211,7 +211,7 @@ async function runResearchPipeline(res, { competitors, location, sections, previ
   });
 
   emit(res, 'progress', { step: 'news', status: 'done', message: 'News search complete' });
-  emit(res, 'progress', { step: 'synthesis', status: 'running', message: 'Claude is writing your brief...' });
+  emit(res, 'progress', { step: 'synthesis', status: 'running', message: 'Gemini is writing your brief...' });
 
   const brief = await synthesizeBrief({ competitorData, newsData, location, sections });
 

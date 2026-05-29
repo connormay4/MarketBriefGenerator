@@ -15,7 +15,8 @@
       "Bash(git pull *)",
       "Bash(git merge *)",
       "Bash(node --disable-warning=ExperimentalWarning -e ' *)",
-      "Bash(node --env-file=.env -e \"require\\('./server/services/research.js'\\); console.log\\('research.js OK'\\)\")"
+      "Bash(node --env-file=.env -e \"require\\('./server/services/research.js'\\); console.log\\('research.js OK'\\)\")",
+      "Bash(npm run *)"
     ]
   },
   "hooks": {
