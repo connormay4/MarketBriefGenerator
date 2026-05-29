@@ -1,6 +1,6 @@
 # CFA Market Intel — Competitor Research Tool
 
-An on-demand competitive intelligence tool for Chick-fil-A franchise owners. Pulls live Google Places data and uses Claude AI with web search to generate a clean 5-minute competitive brief.
+An on-demand competitive intelligence tool for Chick-fil-A franchise owners. Pulls live Google Places data and uses Google Gemini with web search to generate a clean 5-minute competitive brief.
 
 
 ## Quick Start
