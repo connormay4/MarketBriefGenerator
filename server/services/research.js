@@ -3,6 +3,9 @@ const { fetchCompetitorData } = require('./places');
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
+// Single source of truth for the Claude model used across the pipeline.
+const MODEL = 'claude-haiku-4-5-20251001';
+
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
 function emit(res, event, data) {
@@ -52,7 +55,7 @@ async function searchCompetitorNews(name, location) {
   console.log(`[news] ${name} — prompt ~${estimateTokens(messages[0].content.text ?? messages[0].content)} tokens`);
 
   const response = await withRetry(() => client.messages.create({
-    model: 'claude-sonnet-4-6',
+    model: MODEL,
     max_tokens: 300, // tight cap — we only want a short bullet list
     tools: [{ type: 'web_search_20250305', name: 'web_search' }],
     messages
@@ -121,7 +124,7 @@ async function synthesizeBrief({ competitorData, newsData, location, sections })
   console.log(`[synthesis] prompt ~${tokenEstimate} tokens`);
 
   const response = await withRetry(() => client.messages.create({
-    model: 'claude-sonnet-4-6',
+    model: MODEL,
     max_tokens: 1024, // down from 2048 — brief output only
     messages: [{ role: 'user', content: prompt }]
   }), 'synthesis');
