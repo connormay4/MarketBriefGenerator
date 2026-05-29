@@ -47,9 +47,7 @@ function splitSections(markdown) {
 
 export default function BriefViewer({ brief, createdAt, location }) {
   const sections = splitSections(brief);
-  const dateStr = createdAt
-    ? new Date(createdAt).toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric', hour: 'numeric', minute: '2-digit' })
-    : '';
+  const dateStr = createdAt ? formatBriefDateTime(createdAt) : '';
 
   const handlePrint = () => window.print();
 
