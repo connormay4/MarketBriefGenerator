@@ -172,7 +172,7 @@ async function runResearchPipeline(res, { competitors, location, sections, previ
     Promise.allSettled(
       competitors.map(name => fetchCompetitorData(name, location))
     ),
-    // Claude web search — all competitors at once
+    // Gemini web search — all competitors at once
     Promise.allSettled(
       competitors.map(name =>
         searchCompetitorNews(name, location).catch(err => {
