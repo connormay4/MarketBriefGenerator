@@ -132,13 +132,15 @@ async function synthesizeBrief({ competitorData, newsData, location, sections })
   const tokenEstimate = estimateTokens(prompt);
   console.log(`[synthesis] prompt ~${tokenEstimate} tokens`);
 
-  const response = await withRetry(() => client.messages.create({
+  const response = await withRetry(() => getClient().models.generateContent({
     model: MODEL,
-    max_tokens: 1024, // down from 2048 — brief output only
-    messages: [{ role: 'user', content: prompt }]
+    contents: prompt,
+    config: {
+      maxOutputTokens: 1024, // brief output only
+    }
   }), 'synthesis');
 
-  return response.content[0].text;
+  return response.text;
 }
 
 // ─── Pipeline ─────────────────────────────────────────────────────────────────
