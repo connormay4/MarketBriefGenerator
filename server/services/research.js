@@ -126,10 +126,20 @@ async function synthesizeBrief({ competitorData, newsData, location, sections })
     sectionsToInclude.includes('news') &&
       `## SECTION 2 — WHAT'S HAPPENING THIS WEEK\nBullet list of active promos/new items. Flag anything competing with CFA chicken sandwiches, family meals, or catering.`,
     sectionsToInclude.includes('recommendations') &&
-      `## SECTION 3 — OWNER RECOMMENDATIONS\nExactly 3 action items the owner can take THIS WEEK. Bold the action, 1–2 sentences each, tied to the data.`,
+      `## SECTION 3 — OWNER RECOMMENDATIONS\nExactly 3 action items the owner can take THIS WEEK. Bold the action, 1–2 sentences each, tied ONLY to the data above. Focus on Chick-fil-A's own execution, value, and service — not on attacking competitors.`,
   ].filter(Boolean).join('\n\n');
 
-  const prompt = `You are a competitive analyst for a Chick-fil-A franchise in ${location}. Data gathered today:\n\n${dataBlock}\n\nWrite the brief. Be concise. No filler.\n\n${instructions}`;
+  // Guardrails — the model was inventing competitor news and stating single
+  // reviews as fact (e.g. "Popeyes is serving raw chicken"). Constrain it
+  // strictly to the supplied data and require responsible handling of reviews.
+  const rules = [
+    'Use ONLY the data provided above. Do NOT invent or assume promotions, news, menu items, openings, closures, or events that are not present in the data.',
+    'If the NEWS/PROMOS data is empty, missing, or says none was found, state plainly that no competitor news was available this period — and do NOT reference any competitor promotion or news anywhere else in the brief. The brief must be internally consistent.',
+    'Customer reviews are anecdotal opinions from individuals, NOT verified facts. Never present a single review or complaint as an established fact about a competitor. Do NOT assert that a competitor has a food-safety failure (e.g. "serving raw chicken"). At most, note that "some reviewers mention…".',
+    'Never recommend marketing against, publicizing, or "capitalizing on" a competitor\'s alleged food-safety incident or any unverified claim. Keep recommendations focused on Chick-fil-A\'s own standards.',
+  ].map((r, i) => `${i + 1}. ${r}`).join('\n');
+
+  const prompt = `You are a competitive analyst for a Chick-fil-A franchise in ${location}. Data gathered today:\n\n${dataBlock}\n\nWrite the brief. Be concise. No filler.\n\nRULES (follow strictly):\n${rules}\n\n${instructions}`;
 
   const tokenEstimate = estimateTokens(prompt);
   console.log(`[synthesis] prompt ~${tokenEstimate} tokens`);
