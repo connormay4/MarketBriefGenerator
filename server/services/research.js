@@ -61,27 +61,20 @@ async function withRetry(fn, label, maxAttempts = 3) {
 // ─── Step B: news search ──────────────────────────────────────────────────────
 
 async function searchCompetitorNews(name, location) {
-  const messages = [
-    {
-      role: 'user',
-      content: `Search for news about ${name} near ${location}. Return ONLY a markdown bullet list, max 5 bullets, each under 25 words. Cover: active promos/LTOs, new menu items, local openings/closures, national news affecting traffic. No intros or explanations.`
-    }
-  ];
+  const prompt = `Search for news about ${name} near ${location}. Return ONLY a markdown bullet list, max 5 bullets, each under 25 words. Cover: active promos/LTOs, new menu items, local openings/closures, national news affecting traffic. No intros or explanations.`;
 
-  console.log(`[news] ${name} — prompt ~${estimateTokens(messages[0].content.text ?? messages[0].content)} tokens`);
+  console.log(`[news] ${name} — prompt ~${estimateTokens(prompt)} tokens`);
 
-  const response = await withRetry(() => client.messages.create({
+  const response = await withRetry(() => getClient().models.generateContent({
     model: MODEL,
-    max_tokens: 300, // tight cap — we only want a short bullet list
-    tools: [{ type: 'web_search_20250305', name: 'web_search' }],
-    messages
+    contents: prompt,
+    config: {
+      maxOutputTokens: 300, // tight cap — we only want a short bullet list
+      tools: [{ googleSearch: {} }], // Gemini's web-search grounding
+    }
   }), `news:${name}`);
 
-  const text = response.content
-    .filter(b => b.type === 'text')
-    .map(b => b.text)
-    .join('\n')
-    .trim();
+  const text = (response.text ?? '').trim();
 
   // Hard cap the output before it enters the synthesis prompt
   const capped = truncate(text || 'No recent news found.', 500);
