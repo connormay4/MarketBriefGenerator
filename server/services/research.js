@@ -89,14 +89,22 @@ async function searchCompetitorNews(name, location) {
 async function synthesizeBrief({ competitorData, newsData, location, sections }) {
   const sectionsToInclude = sections || ['ratings', 'news', 'recommendations'];
 
-  // Ratings table — compact one-liner per competitor
+  // Ratings table — compact one-liner per competitor.
+  // Trend compares this pull's rating to the previous brief's snapshot. When
+  // there is no prior data point we label it "New" (NOT "first period" / a
+  // model-invented phrase). previousRating may be 0-or-null, so test != null.
   const ratingsTable = competitorData.map(c => {
-    const trend = c.previousRating
-      ? c.rating > c.previousRating ? `▲${c.previousRating}→${c.rating}`
-        : c.rating < c.previousRating ? `▼${c.previousRating}→${c.rating}`
-        : '→ same'
-      : 'first';
-    return `${c.name}: ${c.rating ?? 'N/A'}★ (${c.reviewCount ?? '?'} reviews) ${trend}`;
+    let trend;
+    if (c.previousRating == null || c.rating == null) {
+      trend = 'New';
+    } else if (c.rating > c.previousRating) {
+      trend = `Up (${c.previousRating}→${c.rating})`;
+    } else if (c.rating < c.previousRating) {
+      trend = `Down (${c.previousRating}→${c.rating})`;
+    } else {
+      trend = 'No change';
+    }
+    return `${c.name} | ${c.rating ?? 'N/A'}★ | ${c.reviewCount ?? '?'} reviews | ${trend}`;
   }).join('\n');
 
   // Reviews — max 3 per competitor, 100 chars each
