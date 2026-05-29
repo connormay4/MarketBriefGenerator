@@ -39,7 +39,7 @@ function estimateTokens(text) {
 
 // Exponential backoff retry — handles 429 and transient 5xx
 async function withRetry(fn, label, maxAttempts = 3) {
-  let delay = 10000; // start at 10 s
+  let delay = 3000; // start at 3 s (was 10 s) → 6 s → 12 s
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
       return await fn();
