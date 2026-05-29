@@ -9,7 +9,13 @@ function getApiKey() {
   return key;
 }
 
-const ai = new GoogleGenAI({ apiKey: getApiKey() });
+// Lazily construct the client so a missing key fails at generation time
+// (with a clear message) rather than crashing server boot.
+let _ai = null;
+function getClient() {
+  if (!_ai) _ai = new GoogleGenAI({ apiKey: getApiKey() });
+  return _ai;
+}
 
 // Single source of truth for the Gemini model used across the pipeline.
 // If the API rejects this ID, try 'gemini-flash-latest' or 'gemini-2.5-flash'.
