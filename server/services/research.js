@@ -138,7 +138,10 @@ async function synthesizeBrief({ competitorData, newsData, location, sections })
     model: MODEL,
     contents: prompt,
     config: {
-      maxOutputTokens: 1024, // brief output only
+      // The full 3-section brief runs ~600-900 tokens of prose; Flash also
+      // consumes output budget on internal "thinking" tokens. 1024 was cutting
+      // the brief off mid-sentence — give generous headroom.
+      maxOutputTokens: 4096,
     }
   }), 'synthesis');
 
