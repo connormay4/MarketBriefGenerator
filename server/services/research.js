@@ -44,8 +44,9 @@ async function withRetry(fn, label, maxAttempts = 3) {
     try {
       return await fn();
     } catch (err) {
-      const is429 = err?.status === 429 || err?.message?.includes('rate_limit');
-      const is5xx = err?.status >= 500;
+      const msg = err?.message ?? '';
+      const is429 = err?.status === 429 || msg.includes('rate_limit') || msg.includes('RESOURCE_EXHAUSTED') || msg.includes('429');
+      const is5xx = err?.status >= 500 || msg.includes('UNAVAILABLE') || msg.includes('500') || msg.includes('503');
       if ((is429 || is5xx) && attempt < maxAttempts) {
         console.warn(`[retry] ${label} — attempt ${attempt} failed (${err.status ?? err.message}), retrying in ${delay / 1000}s`);
         await new Promise(r => setTimeout(r, delay));
