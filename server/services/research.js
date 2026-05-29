@@ -1,10 +1,19 @@
-const Anthropic = require('@anthropic-ai/sdk');
+const { GoogleGenAI } = require('@google/genai');
 const { fetchCompetitorData } = require('./places');
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+function getApiKey() {
+  const key = process.env.GEMINI_API_KEY || process.env.GOOGLE_API_KEY;
+  if (!key || key.startsWith('your_')) {
+    throw new Error('GEMINI_API_KEY is not configured. Add a valid Google AI Studio key to your .env file.');
+  }
+  return key;
+}
 
-// Single source of truth for the Claude model used across the pipeline.
-const MODEL = 'claude-haiku-4-5-20251001';
+const ai = new GoogleGenAI({ apiKey: getApiKey() });
+
+// Single source of truth for the Gemini model used across the pipeline.
+// If the API rejects this ID, try 'gemini-flash-latest' or 'gemini-2.5-flash'.
+const MODEL = 'gemini-3.5-flash';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
