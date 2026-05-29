@@ -16,7 +16,10 @@
       "Bash(git merge *)",
       "Bash(node --disable-warning=ExperimentalWarning -e ' *)",
       "Bash(node --env-file=.env -e \"require\\('./server/services/research.js'\\); console.log\\('research.js OK'\\)\")",
-      "Bash(npm run *)"
+      "Bash(npm run *)",
+      "Bash(DATA_DIR=/tmp/cfa-test node --disable-warning=ExperimentalWarning -e \"const {getDb}=require\\('./server/db.js'\\); const db=getDb\\(\\); const r=db.prepare\\('SELECT value FROM settings WHERE key=?'\\).get\\('location'\\); console.log\\('DB at custom DATA_DIR works; location row:', r?.value\\);\")",
+      "Read(//tmp/**)",
+      "Bash(rm -rf /tmp/cfa-test && git log origin/main --oneline -1)"
     ]
   },
   "hooks": {

@@ -69,9 +69,8 @@ async function searchCompetitorNews(name, location) {
     model: MODEL,
     contents: prompt,
     config: {
-      // Flash models spend part of the output budget on internal "thinking"
-      // tokens. Keep headroom so the bullet list isn't truncated.
-      maxOutputTokens: 1024,
+      // No output token cap — let the model decide length (prompt still asks
+      // for a short bullet list).
       tools: [{ googleSearch: {} }], // Gemini's web-search grounding
     }
   }), `news:${name}`);
