@@ -130,7 +130,7 @@ async function synthesizeBrief({ competitorData, newsData, location, sections })
 
   const instructions = [
     sectionsToInclude.includes('ratings') &&
-      `## SECTION 1 — RATINGS LANDSCAPE\nTable: name | rating | reviews | trend. Then 2 sentences on the biggest mover.`,
+      `## SECTION 1 — RATINGS LANDSCAPE\nRender a markdown table with columns: Competitor | Rating | Reviews | Trend. For the Trend column, copy the trend value provided for each competitor in the RATINGS data EXACTLY — do not rephrase, relabel, or invent it (e.g. keep "New" as "New", keep "Up (4.0→4.2)" verbatim). Then 2 sentences on the biggest mover.`,
     sectionsToInclude.includes('news') &&
       `## SECTION 2 — WHAT'S HAPPENING THIS WEEK\nBullet list of active promos/new items. Flag anything competing with CFA chicken sandwiches, family meals, or catering.`,
     sectionsToInclude.includes('recommendations') &&
