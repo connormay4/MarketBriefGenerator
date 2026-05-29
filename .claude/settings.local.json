@@ -2,7 +2,23 @@
   "permissions": {
     "allow": [
       "Bash(npm install *)",
-      "Bash(node -e \"const {DatabaseSync} = require\\('node:sqlite'\\); console.log\\('node:sqlite OK'\\)\")"
+      "Bash(node -e \"const {DatabaseSync} = require\\('node:sqlite'\\); console.log\\('node:sqlite OK'\\)\")",
+      "Bash(git credential *)",
+      "Bash(python3 -c \"import sys,json; prs=json.load\\(sys.stdin\\); print\\(prs[0]['html_url'] if prs else 'none'\\)\")"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit|NotebookEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /Users/connormay/CompetitorResearch || exit 0; git add -A; if ! git diff --cached --quiet; then git commit -q -m \"Auto-commit via Claude Code $(date '+%F %T')\"; git push -q origin HEAD 2>/dev/null; fi",
+            "statusMessage": "Auto-committing & syncing to GitHub..."
+          }
+        ]
+      }
     ]
   }
 }
