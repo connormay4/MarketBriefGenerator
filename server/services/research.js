@@ -132,38 +132,54 @@ async function synthesizeBrief({ competitorData, newsData, location, sections })
 // ─── Pipeline ─────────────────────────────────────────────────────────────────
 
 async function runResearchPipeline(res, { competitors, location, sections, previousSnapshots }) {
-  emit(res, 'progress', { step: 'ratings', status: 'running', message: 'Fetching competitor ratings from Google Places...' });
+  // ── Step A & B run in parallel ────────────────────────────────────────────
+  // Places fetches and Claude web searches are fully independent — fire them
+  // all at once instead of waiting for each one before starting the next.
+  emit(res, 'progress', { step: 'ratings', status: 'running', message: `Fetching all ${competitors.length} competitors in parallel...` });
+  emit(res, 'progress', { step: 'news',    status: 'running', message: `Searching news for all ${competitors.length} competitors in parallel...` });
 
-  const competitorData = [];
-  for (const name of competitors) {
-    emit(res, 'progress', { step: 'ratings', status: 'running', message: `Fetching ${name}...` });
-    const data = await fetchCompetitorData(name, location);
+  const [ratingsResults, newsResults] = await Promise.all([
+    // Places — all competitors at once
+    Promise.allSettled(
+      competitors.map(name => fetchCompetitorData(name, location))
+    ),
+    // Claude web search — all competitors at once
+    Promise.allSettled(
+      competitors.map(name =>
+        searchCompetitorNews(name, location).catch(err => {
+          console.error(`[news] ${name} failed:`, err.message);
+          return '(news unavailable)';
+        })
+      )
+    )
+  ]);
+
+  // Unpack ratings
+  const competitorData = ratingsResults.map((result, i) => {
+    const name = competitors[i];
+    const data = result.status === 'fulfilled'
+      ? result.value
+      : { name, error: result.reason?.message ?? 'unknown error', rating: null, reviewCount: null, reviews: [] };
     data.previousRating = previousSnapshots[name]?.rating ?? null;
-    // Surface Places errors immediately in the UI so the owner knows why ratings are missing
     if (data.error) {
       emit(res, 'progress', { step: 'ratings', status: 'running', message: `⚠️ ${name}: ${data.error}` });
     }
-    competitorData.push(data);
-  }
+    return data;
+  });
 
   const successCount = competitorData.filter(c => c.rating !== null).length;
-  const doneMsg = successCount === competitorData.length
-    ? `Fetched ratings for all ${successCount} competitors`
-    : `Fetched ratings for ${successCount}/${competitorData.length} competitors — check server log for errors`;
-  emit(res, 'progress', { step: 'ratings', status: 'done', message: doneMsg });
-  emit(res, 'progress', { step: 'news', status: 'running', message: 'Searching for news and promotions...' });
+  emit(res, 'progress', {
+    step: 'ratings', status: 'done',
+    message: successCount === competitorData.length
+      ? `Ratings fetched for all ${successCount} competitors`
+      : `Ratings fetched for ${successCount}/${competitorData.length} competitors`
+  });
 
+  // Unpack news
   const newsData = {};
-  for (const name of competitors) {
-    emit(res, 'progress', { step: 'news', status: 'running', message: `Searching news for ${name}...` });
-    try {
-      newsData[name] = await searchCompetitorNews(name, location);
-    } catch (err) {
-      // Graceful fallback — don't let one failed search kill the whole brief
-      console.error(`[news] ${name} failed:`, err.message);
-      newsData[name] = '(news unavailable)';
-    }
-  }
+  newsResults.forEach((result, i) => {
+    newsData[competitors[i]] = result.status === 'fulfilled' ? result.value : '(news unavailable)';
+  });
 
   emit(res, 'progress', { step: 'news', status: 'done', message: 'News search complete' });
   emit(res, 'progress', { step: 'synthesis', status: 'running', message: 'Claude is writing your brief...' });
