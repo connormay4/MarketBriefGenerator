@@ -2,7 +2,11 @@ const { DatabaseSync } = require('node:sqlite');
 const path = require('path');
 const fs = require('fs');
 
-const DATA_DIR = path.join(__dirname, '..', 'data');
+// DATA_DIR lets the database live on a persistent volume (e.g. a Railway
+// volume mounted at /data) instead of inside the deployed code directory,
+// which is wiped on every redeploy. Falls back to the local ./data folder
+// for development. This is what makes rating "trends" survive between briefs.
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '..', 'data');
 const DB_PATH = path.join(DATA_DIR, 'briefs.db');
 
 let db;
