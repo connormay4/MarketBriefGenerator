@@ -162,7 +162,7 @@ async function synthesizeBrief({ competitorData, newsData, location, sections })
 
 async function runResearchPipeline(res, { competitors, location, sections, previousSnapshots }) {
   // ── Step A & B run in parallel ────────────────────────────────────────────
-  // Places fetches and Claude web searches are fully independent — fire them
+  // Places fetches and Gemini web searches are fully independent — fire them
   // all at once instead of waiting for each one before starting the next.
   emit(res, 'progress', { step: 'ratings', status: 'running', message: `Fetching all ${competitors.length} competitors in parallel...` });
   emit(res, 'progress', { step: 'news',    status: 'running', message: `Searching news for all ${competitors.length} competitors in parallel...` });
