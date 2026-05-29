@@ -158,9 +158,9 @@ async function synthesizeBrief({ competitorData, newsData, location, sections })
     model: MODEL,
     contents: prompt,
     // No output token cap — let the model write the full brief unconstrained.
-    // Disable "thinking" for speed; the prompt is highly prescriptive so the
-    // model doesn't need extended internal reasoning to format the brief.
-    config: { thinkingConfig: { thinkingBudget: 0 } },
+    // Small thinking budget: enough internal reasoning to keep the
+    // recommendations sharp, but far cheaper/faster than unbounded thinking.
+    config: { thinkingConfig: { thinkingBudget: 256 } },
   }), 'synthesis');
 
   return response.text;
