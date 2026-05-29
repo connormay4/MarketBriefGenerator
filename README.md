@@ -92,8 +92,8 @@ If the wrong location appears (e.g., it finds a location across town instead of 
 4. Click **Generate New Brief**
 5. Watch the 3-step progress indicator as it:
    - Fetches ratings from Google Places (~5 competitors)
-   - Searches news/promotions via Claude web search
-   - Synthesizes the brief with Claude
+   - Searches news/promotions via Gemini + Google Search grounding
+   - Synthesizes the brief with Gemini
 6. Read the brief — Recommendations section is expanded first
 
 ## Settings
