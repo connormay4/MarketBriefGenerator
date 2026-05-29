@@ -1,14 +1,5 @@
 import React from 'react';
-
-function formatDate(dateStr) {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
-}
-
-function formatTime(dateStr) {
-  const d = new Date(dateStr);
-  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
-}
+import { formatShortDate as formatDate, formatShortTime as formatTime } from '../lib/date';
 
 export default function Sidebar({ briefs, activeBriefId, onSelect, onNewBrief, generating, onSettings }) {
   return (
