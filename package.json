@@ -9,7 +9,6 @@
     "install:all": "npm install && cd client && npm install"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.39.0",
     "@google/genai": "^2.7.0",
     "concurrently": "^8.2.2",
     "cors": "^2.8.5",
