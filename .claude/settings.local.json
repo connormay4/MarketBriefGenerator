@@ -27,7 +27,14 @@
       "Bash(echo \"started pid $!\")",
       "Bash(curl -s http://localhost:3001/health)",
       "Bash(curl -s -X POST http://localhost:3001/api/profile -H \"Content-Type: application/json\" -d '{\"linkedinUrl\":\"https://www.linkedin.com/in/jane-doe-pm-7a3b21\"}')",
-      "Bash(curl -s -X POST http://localhost:3001/api/profile -H \"Content-Type: application/json\" -d '{\"linkedinUrl\":\"https://twitter.com/jane\"}')"
+      "Bash(curl -s -X POST http://localhost:3001/api/profile -H \"Content-Type: application/json\" -d '{\"linkedinUrl\":\"https://twitter.com/jane\"}')",
+      "Bash(xargs kill)",
+      "mcp__Claude_Preview__preview_start",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "Bash(curl -s -i -X OPTIONS http://localhost:3001/api/profile -H \"Origin: http://localhost:5173\" -H \"Access-Control-Request-Method: POST\" -H \"Access-Control-Request-Headers: content-type\")",
+      "Bash(curl -s -i -X POST http://localhost:3001/api/profile -H \"Origin: http://localhost:5173\" -H \"Content-Type: application/json\" -d '{\"linkedinUrl\":\"https://www.linkedin.com/in/satya-nadella\"}')",
+      "Bash(curl -s -i -X POST http://localhost:3001/api/profile -H \"Origin: http://evil.example.com\" -H \"Content-Type: application/json\" -d '{\"linkedinUrl\":\"https://www.linkedin.com/in/satya-nadella\"}')",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173)"
     ]
   },
   "hooks": {
