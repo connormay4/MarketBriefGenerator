@@ -22,7 +22,12 @@
       "Bash(rm -rf /tmp/cfa-test && git log origin/main --oneline -1)",
       "Bash(npm --version)",
       "Bash(ls -la /Users/connormay/ConnectionBrief 2>/dev/null && echo \"EXISTS\" || echo \"Does not exist — safe to create\")",
-      "Bash(mkdir -p /Users/connormay/ConnectionBrief/backend/routes /Users/connormay/ConnectionBrief/backend/services /Users/connormay/ConnectionBrief/frontend/src && echo \"dirs created\")"
+      "Bash(mkdir -p /Users/connormay/ConnectionBrief/backend/routes /Users/connormay/ConnectionBrief/backend/services /Users/connormay/ConnectionBrief/frontend/src && echo \"dirs created\")",
+      "Bash(PORT=3001 node server.js)",
+      "Bash(echo \"started pid $!\")",
+      "Bash(curl -s http://localhost:3001/health)",
+      "Bash(curl -s -X POST http://localhost:3001/api/profile -H \"Content-Type: application/json\" -d '{\"linkedinUrl\":\"https://www.linkedin.com/in/jane-doe-pm-7a3b21\"}')",
+      "Bash(curl -s -X POST http://localhost:3001/api/profile -H \"Content-Type: application/json\" -d '{\"linkedinUrl\":\"https://twitter.com/jane\"}')"
     ]
   },
   "hooks": {
