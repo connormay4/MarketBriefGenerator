@@ -50,7 +50,8 @@
       "Bash(node --check routes/profile.js)",
       "Bash(MOCK_MODE=true PORT=3001 node server.js)",
       "Bash(curl -s -X POST http://localhost:3001/api/profile -H \"Content-Type: application/json\" -d '{\"linkedinUrl\":\"https://www.linkedin.com/in/jane-doe-pm\"}')",
-      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('name:',d['name']\\); print\\('confidence:',d['confidence']\\); print\\('meta:',d['meta']\\)\")"
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('name:',d['name']\\); print\\('confidence:',d['confidence']\\); print\\('meta:',d['meta']\\)\")",
+      "Bash(node --check server.js)"
     ]
   },
   "hooks": {
