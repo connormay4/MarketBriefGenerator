@@ -37,7 +37,15 @@ if (fs.existsSync(CLIENT_DIST)) {
   console.log('[server] no client build found — API-only mode (run `npm run build` for production)');
 }
 
-// Bind to 0.0.0.0 so cloud hosts (Railway, etc.) can route external traffic.
-app.listen(PORT, '0.0.0.0', () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
+// Only start a long-running HTTP listener when this file is executed directly
+// (local dev via `npm run server`, or a persistent host like Railway via
+// `npm start`). On Vercel the file is imported as a serverless function — there
+// is no listener; Vercel invokes the exported Express handler per request.
+if (require.main === module) {
+  // Bind to 0.0.0.0 so cloud hosts can route external traffic.
+  app.listen(PORT, '0.0.0.0', () => {
+    console.log(`Server running on http://localhost:${PORT}`);
+  });
+}
+
+module.exports = app;
