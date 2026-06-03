@@ -92,22 +92,11 @@ async function synthesizeBrief({ competitorData, newsData, location, sections })
   const sectionsToInclude = sections || ['ratings', 'news', 'recommendations'];
 
   // Ratings table — compact one-liner per competitor.
-  // Trend compares this pull's rating to the previous brief's snapshot. When
-  // there is no prior data point we label it "New" (NOT "first period" / a
-  // model-invented phrase). previousRating may be 0-or-null, so test != null.
-  const ratingsTable = competitorData.map(c => {
-    let trend;
-    if (c.previousRating == null || c.rating == null) {
-      trend = 'New';
-    } else if (c.rating > c.previousRating) {
-      trend = `Up (${c.previousRating}→${c.rating})`;
-    } else if (c.rating < c.previousRating) {
-      trend = `Down (${c.previousRating}→${c.rating})`;
-    } else {
-      trend = 'No change';
-    }
-    return `${c.name} | ${c.rating ?? 'N/A'}★ | ${c.reviewCount ?? '?'} reviews | ${trend}`;
-  }).join('\n');
+  // Trend comparison removed: the app runs on Vercel's ephemeral storage where a
+  // prior snapshot can't persist between briefs, so Trend is always "No change".
+  const ratingsTable = competitorData.map(c =>
+    `${c.name} | ${c.rating ?? 'N/A'}★ | ${c.reviewCount ?? '?'} reviews | No change`
+  ).join('\n');
 
   // Reviews — max 3 per competitor, 100 chars each
   const reviewsSection = competitorData.map(c => {
