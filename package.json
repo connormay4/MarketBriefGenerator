@@ -6,7 +6,12 @@
     "dev": "concurrently \"npm run server\" \"npm run client\"",
     "server": "node --env-file=.env --disable-warning=ExperimentalWarning server/index.js",
     "client": "cd client && npm run dev",
-    "install:all": "npm install && cd client && npm install"
+    "install:all": "npm install && cd client && npm install",
+    "build": "cd client && npm install && npm run build",
+    "start": "node --disable-warning=ExperimentalWarning server/index.js"
+  },
+  "engines": {
+    "node": ">=22.5.0"
   },
   "dependencies": {
     "@google/genai": "^2.7.0",
