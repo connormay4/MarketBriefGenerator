@@ -138,6 +138,7 @@ async function synthesizeBrief({ competitorData, newsData, location, sections })
     'If the NEWS/PROMOS data is empty, missing, or says none was found, state plainly that no competitor news was available this period — and do NOT reference any competitor promotion or news anywhere else in the brief. The brief must be internally consistent.',
     'Customer reviews are anecdotal opinions from individuals, NOT verified facts. Never present a single review or complaint as an established fact about a competitor. Do NOT assert that a competitor has a food-safety failure (e.g. "serving raw chicken"). At most, note that "some reviewers mention…".',
     'Never recommend marketing against, publicizing, or "capitalizing on" a competitor\'s alleged food-safety incident or any unverified claim. Keep recommendations focused on Chick-fil-A\'s own standards.',
+    'Recent review trends come ONLY from the dated Google review entries provided. There is NO previous report or earlier brief to compare against — never claim a rating "rose", "fell", or "changed" relative to a past period you were not given.',
   ].map((r, i) => `${i + 1}. ${r}`).join('\n');
 
   const prompt = `You are a competitive analyst for a Chick-fil-A franchise in ${location}. Data gathered today:\n\n${dataBlock}\n\nWrite the brief. Be concise. No filler.\n\nRULES (follow strictly):\n${rules}\n\n${instructions}`;
