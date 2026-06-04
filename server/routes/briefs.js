@@ -48,21 +48,13 @@ router.post('/generate', async (req, res) => {
     // Load active competitors
     const competitors = db.prepare("SELECT name FROM competitors WHERE active = 1").all().map(r => r.name);
 
-    // Load last snapshot for trend comparison
-    const lastBrief = db.prepare("SELECT ratings_snapshot FROM briefs ORDER BY created_at DESC LIMIT 1").get();
-    const previousSnapshots = {};
-    if (lastBrief) {
-      const snapshot = JSON.parse(lastBrief.ratings_snapshot);
-      for (const item of snapshot) {
-        previousSnapshots[item.name] = item;
-      }
-    }
-
+    // Note: we intentionally do NOT load a previous brief for trend comparison.
+    // Review trends are derived from the recency of the live Google reviews in
+    // the pipeline, not from a prior saved brief.
     const { brief, competitorData } = await runResearchPipeline(res, {
       competitors,
       location,
-      sections,
-      previousSnapshots
+      sections
     });
 
     // Save to DB
