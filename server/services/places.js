@@ -29,7 +29,9 @@ async function searchPlace(name, location) {
 
 async function getPlaceReviews(placeId) {
   const API_KEY = getApiKey();
-  const url = `${PLACES_BASE}/details/json?place_id=${placeId}&fields=reviews&key=${API_KEY}`;
+  // reviews_sort=newest → return the most recent reviews first so we can gauge
+  // how a competitor is trending over the last week (default is most_relevant).
+  const url = `${PLACES_BASE}/details/json?place_id=${placeId}&fields=reviews&reviews_sort=newest&key=${API_KEY}`;
 
   const res = await fetch(url);
   if (!res.ok) throw new Error(`Places details HTTP ${res.status}`);
