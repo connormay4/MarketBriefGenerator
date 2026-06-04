@@ -160,7 +160,7 @@ async function synthesizeBrief({ competitorData, newsData, location, sections })
 
 // ─── Pipeline ─────────────────────────────────────────────────────────────────
 
-async function runResearchPipeline(res, { competitors, location, sections, previousSnapshots }) {
+async function runResearchPipeline(res, { competitors, location, sections }) {
   // ── Step A & B run in parallel ────────────────────────────────────────────
   // Places fetches and Gemini web searches are fully independent — fire them
   // all at once instead of waiting for each one before starting the next.
