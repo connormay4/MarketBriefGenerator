@@ -91,21 +91,23 @@ async function searchCompetitorNews(name, location) {
 async function synthesizeBrief({ competitorData, newsData, location, sections }) {
   const sectionsToInclude = sections || ['ratings', 'news', 'recommendations'];
 
-  // Ratings table — compact one-liner per competitor.
-  // Trend comparison removed: the app runs on Vercel's ephemeral storage where a
-  // prior snapshot can't persist between briefs, so Trend is always "No change".
+  // Ratings table — overall rating + total review count per competitor. The
+  // "Recent Trend" column is filled by the model from the recency of the Google
+  // reviews below (NOT from any prior brief).
   const ratingsTable = competitorData.map(c =>
-    `${c.name} | ${c.rating ?? 'N/A'}★ | ${c.reviewCount ?? '?'} reviews | No change`
+    `${c.name} | ${c.rating ?? 'N/A'}★ | ${c.reviewCount ?? '?'} total reviews`
   ).join('\n');
 
-  // Reviews — max 3 per competitor, 100 chars each
+  // Recent Google reviews — up to 5 each, with their recency (e.g. "a week ago")
+  // and star rating, so the model can judge how each competitor's reviews are
+  // trending over the last week.
   const reviewsSection = competitorData.map(c => {
     if (!c.reviews?.length) return '';
-    const top3 = c.reviews
-      .slice(0, 3)
-      .map(r => `- ${truncate(r.text, 100)} (${r.rating}★)`)
+    const recent = c.reviews
+      .slice(0, 5)
+      .map(r => `- [${r.time ?? 'date n/a'}, ${r.rating}★] ${truncate(r.text, 120)}`)
       .join('\n');
-    return `${c.name}:\n${top3}`;
+    return `${c.name}:\n${recent}`;
   }).filter(Boolean).join('\n\n');
 
   // News — already capped at 500 chars each in searchCompetitorNews
