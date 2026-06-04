@@ -123,7 +123,7 @@ async function synthesizeBrief({ competitorData, newsData, location, sections })
 
   const instructions = [
     sectionsToInclude.includes('ratings') &&
-      `## SECTION 1 — RATINGS LANDSCAPE\nRender a markdown table with columns: Competitor | Rating | Reviews | Trend. The Trend column must say "No change" for EVERY competitor — do not invent, infer, or vary it. Then 2 sentences on who currently leads and who lags on rating.`,
+      `## SECTION 1 — RATINGS LANDSCAPE\nRender a markdown table with columns: Competitor | Rating | Total Reviews | Recent Trend. For "Recent Trend", look ONLY at the recent Google reviews in the TOP REVIEWS data — use their dates (e.g. "a week ago") and star ratings to judge how each competitor's reviews are trending in the LAST WEEK. Pick one: Improving / Declining / Stable / Few recent reviews. If there are no reviews dated within roughly the last week, use "Few recent reviews". Base this ONLY on those Google review entries — never on any previous report or brief. Then 2 sentences on who is gaining or losing momentum in recent reviews.`,
     sectionsToInclude.includes('news') &&
       `## SECTION 2 — WHAT'S HAPPENING THIS WEEK\nBullet list of active promos/new items. Flag anything competing with CFA chicken sandwiches, family meals, or catering.`,
     sectionsToInclude.includes('recommendations') &&
