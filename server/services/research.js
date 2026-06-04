@@ -189,7 +189,6 @@ async function runResearchPipeline(res, { competitors, location, sections, previ
     const data = result.status === 'fulfilled'
       ? result.value
       : { name, error: result.reason?.message ?? 'unknown error', rating: null, reviewCount: null, reviews: [] };
-    data.previousRating = previousSnapshots[name]?.rating ?? null;
     if (data.error) {
       emit(res, 'progress', { step: 'ratings', status: 'running', message: `⚠️ ${name}: ${data.error}` });
     }
