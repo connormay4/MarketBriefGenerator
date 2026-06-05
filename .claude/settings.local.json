@@ -65,7 +65,8 @@
       "WebFetch(domain:raw.githubusercontent.com)",
       "Bash(ls ~/.claude/commands/ 2>&1)",
       "Bash(mkdir -p ~/.claude/commands/website-builder-setup)",
-      "Bash(curl -s \"https://raw.githubusercontent.com/tenfoldmarc/website-builder-setup/main/website-builder-setup/SKILL.md\" > ~/.claude/commands/website-builder-setup/SKILL.md && echo \"Done\")"
+      "Bash(curl -s \"https://raw.githubusercontent.com/tenfoldmarc/website-builder-setup/main/website-builder-setup/SKILL.md\" > ~/.claude/commands/website-builder-setup/SKILL.md && echo \"Done\")",
+      "Bash(grep -E \"vercel.json$\")"
     ]
   },
   "hooks": {
