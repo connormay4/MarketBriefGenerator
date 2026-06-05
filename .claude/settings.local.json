@@ -73,7 +73,8 @@
       "Bash(curl -s -m 12 -I \"https://market-brief-generator-connor-m-projects17.vercel.app/\")",
       "Bash(curl -s -m 15 -D - -o /dev/null -H 'Origin: https://market-brief-generator.vercel.app' https://marketbriefgenerator-production.up.railway.app/api/briefs)",
       "Bash(curl -s -N -m 120 -X POST -H 'Content-Type: application/json' https://marketbriefgenerator-production.up.railway.app/api/briefs/generate)",
-      "Bash(curl -s -m 30 -D - -o /dev/null -X POST -H 'Origin: https://market-brief-generator.vercel.app' -H 'Content-Type: application/json' https://marketbriefgenerator-production.up.railway.app/api/briefs/generate)"
+      "Bash(curl -s -m 30 -D - -o /dev/null -X POST -H 'Origin: https://market-brief-generator.vercel.app' -H 'Content-Type: application/json' https://marketbriefgenerator-production.up.railway.app/api/briefs/generate)",
+      "Bash(node -e ' *)"
     ]
   },
   "hooks": {
