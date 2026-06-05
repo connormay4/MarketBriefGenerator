@@ -72,36 +72,45 @@ export function generateBrief({ onProgress, onComplete, onError }) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const reader = res.body.getReader();
     const decoder = new TextDecoder();
-    let buffer = '';
 
+    // Parse ONE complete SSE event block ("event: x\ndata: {...}") and dispatch.
+    const dispatch = (rawEvent) => {
+      let eventType = 'message';
+      const dataLines = [];
+      for (const line of rawEvent.split('\n')) {
+        if (line.startsWith('event:')) eventType = line.slice(6).trim();
+        else if (line.startsWith('data:')) dataLines.push(line.slice(5).replace(/^ /, ''));
+      }
+      if (!dataLines.length) return;
+      try {
+        const payload = JSON.parse(dataLines.join('\n'));
+        if (eventType === 'progress') onProgress?.(payload);
+        else if (eventType === 'complete') onComplete?.(payload);
+        else if (eventType === 'error') onError?.(new Error(payload.message));
+      } catch {}
+    };
+
+    // CRITICAL: `buffer` persists across reads. SSE events are delimited by a
+    // blank line (\n\n). A single network chunk may contain several events, a
+    // partial event, or split one event in two — especially the large final
+    // "complete" payload. The previous parser reset its state every chunk, so a
+    // split event (the brief) was dropped and the UI never updated. Here we keep
+    // the trailing partial event in `buffer` until its terminator arrives.
+    let buffer = '';
     while (true) {
       const { done, value } = await reader.read();
       if (done) break;
+      buffer += decoder.decode(value, { stream: true }).replace(/\r\n/g, '\n');
 
-      buffer += decoder.decode(value, { stream: true });
-      const lines = buffer.split('\n');
-      buffer = lines.pop(); // keep incomplete line
-
-      let eventType = null;
-      let dataLine = null;
-
-      for (const line of lines) {
-        if (line.startsWith('event: ')) {
-          eventType = line.slice(7).trim();
-        } else if (line.startsWith('data: ')) {
-          dataLine = line.slice(6).trim();
-        } else if (line === '' && eventType && dataLine) {
-          try {
-            const payload = JSON.parse(dataLine);
-            if (eventType === 'progress') onProgress?.(payload);
-            else if (eventType === 'complete') onComplete?.(payload);
-            else if (eventType === 'error') onError?.(new Error(payload.message));
-          } catch {}
-          eventType = null;
-          dataLine = null;
-        }
+      let sep;
+      while ((sep = buffer.indexOf('\n\n')) !== -1) {
+        const rawEvent = buffer.slice(0, sep);
+        buffer = buffer.slice(sep + 2);
+        if (rawEvent.trim()) dispatch(rawEvent);
       }
     }
+    // Flush a final event that wasn't terminated by a trailing blank line.
+    if (buffer.trim()) dispatch(buffer);
   }).catch(err => {
     if (err.name !== 'AbortError') onError?.(err);
   });
