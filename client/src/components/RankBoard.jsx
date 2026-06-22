@@ -92,11 +92,11 @@ export default function RankBoard({ rankings, onRefresh, status, updatedAt }) {
         })}
       </div>
 
-      {rankings.note && (
-        <div className="px-6 pb-4 -mt-1">
-          <p className="text-[11px] text-stone-400">{rankings.note}</p>
-        </div>
-      )}
+      <div className="px-6 pb-4 -mt-1 space-y-0.5">
+        {status?.running && <p className="text-[11px] text-cfa-red font-medium">{status.message || 'Refreshing…'}</p>}
+        {rankings.note && <p className="text-[11px] text-stone-400">{rankings.note}</p>}
+        {updatedAt && <p className="text-[11px] text-stone-300">Updated {new Date(updatedAt.replace(' ', 'T') + 'Z').toLocaleDateString()}</p>}
+      </div>
     </section>
   );
 }
