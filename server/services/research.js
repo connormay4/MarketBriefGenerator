@@ -169,12 +169,12 @@ async function synthesizeBrief({ competitorData, newsData, location, sections })
 
 // ─── Pipeline ─────────────────────────────────────────────────────────────────
 
-async function runResearchPipeline(res, { competitors, location, sections }) {
+async function runResearchPipeline({ competitors, location, sections, emit = () => {} }) {
   // ── Step A & B run in parallel ────────────────────────────────────────────
   // Places fetches and Gemini web searches are fully independent — fire them
   // all at once instead of waiting for each one before starting the next.
-  emit(res, 'progress', { step: 'ratings', status: 'running', message: `Fetching all ${competitors.length} competitors in parallel...` });
-  emit(res, 'progress', { step: 'news',    status: 'running', message: `Searching news for all ${competitors.length} competitors in parallel...` });
+  emit('progress', { step: 'ratings', status: 'running', message: `Fetching all ${competitors.length} competitors in parallel...` });
+  emit('progress', { step: 'news',    status: 'running', message: `Searching news for all ${competitors.length} competitors in parallel...` });
 
   const [ratingsResults, newsResults] = await Promise.all([
     // Places — all competitors at once
