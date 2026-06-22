@@ -1,5 +1,6 @@
 const { createClient } = require('@libsql/client');
 const path = require('path');
+const fs = require('fs');
 
 // ─── Connection ──────────────────────────────────────────────────────────────
 // We use libSQL (@libsql/client), which speaks BOTH a hosted Turso database and
