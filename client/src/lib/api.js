@@ -76,6 +76,23 @@ export async function savePrice(data) {
   return res.json();
 }
 
+export async function researchPrices() {
+  const res = await fetch(`${BASE}/settings/prices/research`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}',
+  });
+  if (!res.ok) throw new Error('Price research failed');
+  return res.json();
+}
+
+export async function sendTestEmail() {
+  const res = await fetch(`${BASE}/settings/test-email`, {
+    method: 'POST', headers: { 'Content-Type': 'application/json' }, body: '{}',
+  });
+  const data = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(data.error || 'Failed to send test email');
+  return data;
+}
+
 export async function getLatestRanking() {
   const res = await fetch(`${BASE}/rankings/latest`);
   if (!res.ok) throw new Error('Failed to load ranking');
