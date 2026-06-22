@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { all, one, run } = require('../db');
 const { assembleBrief } = require('../services/brief');
-const { renderBriefEmail, sendBriefEmail } = require('../services/email');
+const { renderBriefEmail, sendBriefEmail, sendTestEmail } = require('../services/email');
 const { refreshRanking } = require('../services/rankingJob');
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
