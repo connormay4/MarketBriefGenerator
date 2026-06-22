@@ -38,11 +38,13 @@ function splitSections(markdown) {
   return sections;
 }
 
-export default function BriefViewer({ brief, createdAt, location, extras }) {
+export default function BriefViewer({ brief, createdAt, location, extras, rankings, onRefreshRanking, rankingStatus, rankingUpdatedAt }) {
   const sections = splitSections(brief);
   const dateStr = createdAt ? formatBriefDateTime(createdAt) : '';
   const ex = extras || {};
   const handlePrint = () => window.print();
+  // Prefer the freshest live ranking; fall back to whatever the brief captured.
+  const liveRankings = rankings || ex.rankings;
 
   return (
     <article className="max-w-2xl mx-auto">
