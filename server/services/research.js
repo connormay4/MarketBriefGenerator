@@ -75,7 +75,7 @@ async function searchCompetitorNews(name, location) {
   console.log(`[news] ${name} — prompt ~${estimateTokens(prompt)} tokens`);
 
   const response = await withRetry(() => getClient().models.generateContent({
-    model: MODEL,
+    model: GROUNDING_MODEL,
     contents: prompt,
     config: {
       // No output token cap — let the model decide length (prompt still asks
