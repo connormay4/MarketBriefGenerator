@@ -152,6 +152,42 @@ router.get('/preview', async (req, res) => {
   }
 });
 
+// Build + email a FULL brief on demand (for previewing exactly what the weekly
+// send produces). Uses the latest saved brief if one exists (fast), else
+// generates a fresh one. Merges the freshest ranking snapshot. Streams progress
+// via the passed emit(event, data). Does NOT take the weekly idempotency lock.
+async function sendBriefEmailNow({ emit = () => {}, to } = {}) {
+  emit('progress', { message: 'Preparing your brief…' });
+  const locationRow = await one("SELECT value FROM settings WHERE key = 'location'");
+  const location = locationRow?.value || process.env.LOCATION || 'Hanover, PA 17331';
+
+  let brief = await one('SELECT location, content, extras FROM briefs ORDER BY created_at DESC LIMIT 1');
+  let extras;
+  if (!brief) {
+    emit('progress', { message: 'No brief yet — generating a fresh one (~1–2 min)…' });
+    const sectionsRow = await one("SELECT value FROM settings WHERE key = 'sections'");
+    const sections = sectionsRow ? JSON.parse(sectionsRow.value) : ['ratings', 'news', 'recommendations'];
+    const competitors = (await all("SELECT name FROM competitors WHERE active = 1")).map(r => r.name);
+    const assembled = await assembleBrief({ competitors, location, sections, emit });
+    const snap = JSON.stringify(assembled.competitorData.map(c => ({ name: c.name, rating: c.rating, reviewCount: c.reviewCount })));
+    await run('INSERT INTO briefs (location, content, ratings_snapshot, extras) VALUES (?, ?, ?, ?)',
+      [location, assembled.markdown, snap, JSON.stringify(assembled.extras)]);
+    brief = { location, content: assembled.markdown };
+    extras = assembled.extras;
+  } else {
+    extras = brief.extras ? JSON.parse(brief.extras) : {};
+  }
+
+  // Merge the freshest ranking snapshot so the rank board is current.
+  const rankRow = await one("SELECT payload FROM snapshots WHERE kind = 'ranking' ORDER BY created_at DESC LIMIT 1");
+  if (rankRow) { try { extras = { ...extras, rankings: JSON.parse(rankRow.payload) }; } catch {} }
+
+  emit('progress', { message: 'Rendering and sending the email…' });
+  const html = await renderBriefEmail({ location: brief.location || location, dateLabel: dateLabel(), markdown: brief.content, ...extras });
+  const result = await sendBriefEmail({ html, subject: `Your Weekly Market Brief — ${(brief.location || location).split(',')[0]}`, to });
+  return result;
+}
+
 // Send a tiny test email to confirm Resend key + sender + recipient all work,
 // WITHOUT running the heavy brief pipeline. ?to= overrides the recipient.
 async function testEmail(req, res) {
