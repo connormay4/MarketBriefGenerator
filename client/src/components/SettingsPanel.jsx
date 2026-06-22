@@ -101,6 +101,23 @@ export default function SettingsPanel({ onClose, onSaved }) {
   const [newCompetitor, setNewCompetitor] = useState('');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [testing, setTesting] = useState(false);
+  const [testStatus, setTestStatus] = useState(null);
+
+  async function handleTestEmail() {
+    setTesting(true);
+    setTestStatus(null);
+    try {
+      const r = await sendTestEmail();
+      if (r.sent) setTestStatus({ ok: true, msg: `Sent to ${r.to} — check your inbox (and spam).` });
+      else if (r.dryRun) setTestStatus({ ok: false, msg: 'No RESEND_API_KEY set yet — nothing sent (dry run).' });
+      else setTestStatus({ ok: false, msg: 'Not sent.' });
+    } catch (e) {
+      setTestStatus({ ok: false, msg: e.message });
+    } finally {
+      setTesting(false);
+    }
+  }
 
   useEffect(() => {
     getSettings().then(s => {
