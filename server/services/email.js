@@ -69,8 +69,9 @@ function renderRankingHighlight(rankings) {
     const color = insufficient ? C.gray : (rank <= 3 ? C.good : rank <= Math.ceil(ranked / 2) ? C.warn : C.muted);
     const rankLabel = insufficient ? 'n/a' : `#${rank} of ${ranked}`;
     return `<tr>
-      <td style="padding:7px 0;font:600 13px ${FONT};color:${C.ink};width:42%;">${esc(cat.label)}${cat.n != null ? `<span style="font:400 11px ${FONT};color:${C.muted};"> · ${cat.n} reviews</span>` : ''}</td>
-      <td style="padding:7px 0;">${bar(pct, color, rankLabel)}</td>
+      <td style="padding:8px 10px 8px 0;font:600 13px ${FONT};color:${C.ink};width:38%;vertical-align:middle;">${esc(cat.label)}${cat.n != null ? `<span style="font:400 11px ${FONT};color:${C.muted};"> · ${cat.n} reviews</span>` : ''}</td>
+      <td style="padding:8px 12px;width:44%;vertical-align:middle;">${bar(pct, color)}</td>
+      <td style="padding:8px 0;width:18%;text-align:right;vertical-align:middle;font:700 13px ${FONT};color:${insufficient ? C.muted : C.ink};white-space:nowrap;">${esc(rankLabel)}</td>
     </tr>`;
   }).join('');
   return `${sectionTitle('You vs nearby Chick-fil-As', `Ranked against ${total - 1} closest CFAs`)}
