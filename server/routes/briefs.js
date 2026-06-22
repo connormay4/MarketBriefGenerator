@@ -53,16 +53,20 @@ router.post('/generate', async (req, res) => {
     const competitorRows = await all("SELECT name FROM competitors WHERE active = 1");
     const competitors = competitorRows.map(r => r.name);
 
+    // SSE emitter the pipeline streams progress through.
+    const emit = (event, data) => res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
+
     // Note: we intentionally do NOT load a previous brief for trend comparison.
     // Review trends are derived from the recency of the live Google reviews in
     // the pipeline, not from a prior saved brief.
-    const { brief, competitorData } = await runResearchPipeline(res, {
+    const { markdown, competitorData, extras } = await assembleBrief({
       competitors,
       location,
-      sections
+      sections,
+      emit,
     });
 
-    // Save to DB
+    // Save to DB (content = markdown core; extras = structured sections JSON)
     const ratingsSnapshot = JSON.stringify(competitorData.map(c => ({
       name: c.name,
       rating: c.rating,
@@ -70,13 +74,13 @@ router.post('/generate', async (req, res) => {
     })));
 
     const result = await run(
-      'INSERT INTO briefs (location, content, ratings_snapshot) VALUES (?, ?, ?)',
-      [location, brief, ratingsSnapshot]
+      'INSERT INTO briefs (location, content, ratings_snapshot, extras) VALUES (?, ?, ?, ?)',
+      [location, markdown, ratingsSnapshot, JSON.stringify(extras)]
     );
 
     // libSQL returns lastInsertRowid as BigInt
     const newId = Number(result.lastInsertRowid);
-    res.write(`event: complete\ndata: ${JSON.stringify({ id: newId, brief })}\n\n`);
+    res.write(`event: complete\ndata: ${JSON.stringify({ id: newId, brief: markdown, extras })}\n\n`);
   } catch (err) {
     console.error('Pipeline error:', err);
     res.write(`event: error\ndata: ${JSON.stringify({ message: err.message })}\n\n`);
