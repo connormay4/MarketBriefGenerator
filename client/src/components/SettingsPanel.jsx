@@ -207,6 +207,12 @@ export default function SettingsPanel({ onClose, onSaved }) {
             </form>
           </div>
 
+          {/* Competitor prices */}
+          <div>
+            <label className="block text-sm font-semibold text-stone-700 mb-2">Competitor Prices (Hanover)</label>
+            <PriceEditor />
+          </div>
+
           {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
 
