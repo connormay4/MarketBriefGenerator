@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { all, one, run } = require('../db');
-const { runResearchPipeline } = require('../services/research');
+const { assembleBrief } = require('../services/brief');
 
 // GET /api/briefs — list all past briefs
 router.get('/', async (req, res) => {
