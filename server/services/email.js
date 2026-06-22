@@ -35,16 +35,17 @@ function confBadge(confidence, stale) {
   return `<span style="font:600 11px ${FONT};color:${fg};background:${bg};padding:2px 7px;border-radius:10px;white-space:nowrap;">${esc(text)}</span>`;
 }
 
-// Horizontal bar (email-safe: nested table, no SVG). pct 0..100.
-function bar(pct, color, label) {
-  const w = Math.max(2, Math.min(100, Math.round(pct)));
+// Horizontal bar (email-safe: nested table, no SVG). pct 0..100. The bar gets
+// its OWN full-width cell — never put a nowrap sibling beside the track or
+// auto-layout collapses it.
+function bar(pct, color) {
+  const w = Math.max(3, Math.min(100, Math.round(pct)));
   return `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tr>
-    <td style="background:${C.grayBg};border-radius:5px;padding:0;">
-      <table role="presentation" width="${w}%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;"><tr>
-        <td style="background:${color};border-radius:5px;height:10px;font-size:0;line-height:0;">&nbsp;</td>
+    <td style="background:${C.grayBg};border-radius:5px;padding:0;font-size:0;line-height:0;">
+      <table role="presentation" width="${w}%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;min-width:6px;"><tr>
+        <td style="background:${color};border-radius:5px;height:10px;font-size:1px;line-height:1px;">&#8203;</td>
       </tr></table>
     </td>
-    ${label ? `<td style="padding-left:8px;font:600 12px ${FONT};color:${C.body};white-space:nowrap;">${esc(label)}</td>` : ''}
   </tr></table>`;
 }
 
