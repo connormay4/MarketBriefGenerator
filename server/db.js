@@ -22,6 +22,8 @@ function resolveConfig() {
   const dir =
     process.env.DATA_DIR ||
     (process.env.VERCEL ? '/tmp' : path.join(__dirname, '..', 'data'));
+  // libSQL won't create a missing parent dir for a file: URL — do it ourselves.
+  fs.mkdirSync(dir, { recursive: true });
   return { url: `file:${path.join(dir, 'briefs.db')}` };
 }
 
