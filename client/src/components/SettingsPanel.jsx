@@ -270,6 +270,22 @@ export default function SettingsPanel({ onClose, onSaved }) {
             <PriceEditor />
           </div>
 
+          {/* Weekly email */}
+          <div>
+            <label className="block text-sm font-semibold text-stone-700 mb-2">Weekly Email</label>
+            <button
+              onClick={handleTestEmail}
+              disabled={testing}
+              className="text-xs font-semibold px-4 py-2 rounded-lg bg-stone-800 text-white hover:bg-stone-700 disabled:opacity-60 transition-colors"
+            >
+              {testing ? 'Sending…' : 'Send test email'}
+            </button>
+            {testStatus && (
+              <p className={`text-[11px] mt-2 ${testStatus.ok ? 'text-emerald-600' : 'text-red-600'}`}>{testStatus.msg}</p>
+            )}
+            <p className="text-[11px] text-stone-400 mt-1">Sends a quick test to your configured recipient to confirm email delivery works.</p>
+          </div>
+
           {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
 
