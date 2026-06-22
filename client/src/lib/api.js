@@ -76,11 +76,27 @@ export async function savePrice(data) {
   return res.json();
 }
 
+export async function getLatestRanking() {
+  const res = await fetch(`${BASE}/rankings/latest`);
+  if (!res.ok) throw new Error('Failed to load ranking');
+  return res.json();
+}
+
+// Stream a 25-CFA ranking refresh (SSE). Mirrors generateBrief's reader.
+export function refreshRanking({ onProgress, onComplete, onError }) {
+  return streamSSE(`${BASE}/rankings/refresh`, { onProgress, onComplete, onError });
+}
+
 // Returns an EventSource-compatible reader; calls onProgress(event) and onComplete({id, brief})
 export function generateBrief({ onProgress, onComplete, onError }) {
+  return streamSSE(`${BASE}/briefs/generate`, { onProgress, onComplete, onError });
+}
+
+// Shared SSE POST reader (buffers across chunks; dispatches event blocks).
+function streamSSE(url, { onProgress, onComplete, onError }) {
   const controller = new AbortController();
 
-  fetch(`${BASE}/briefs/generate`, {
+  fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     signal: controller.signal
