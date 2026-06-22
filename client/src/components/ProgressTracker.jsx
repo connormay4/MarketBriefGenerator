@@ -4,6 +4,7 @@ const STEPS = [
   { key: 'ratings', label: 'Fetching ratings' },
   { key: 'news', label: 'Searching news & promos' },
   { key: 'synthesis', label: 'Writing brief' },
+  { key: 'extras', label: 'Pricing, your reviews & breakfast' },
 ];
 
 export default function ProgressTracker({ steps, currentMessage }) {
