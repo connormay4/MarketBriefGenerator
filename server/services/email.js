@@ -165,14 +165,15 @@ async function renderMarkdownCore(markdown) {
 }
 
 // ─── Shell ────────────────────────────────────────────────────────────────────
-function renderBriefEmail(data = {}) {
+async function renderBriefEmail(data = {}) {
   const { location = 'Hanover, PA', dateLabel = '', markdown = '', pricing, ownStore, breakfast, rankings } = data;
+  const markdownHtml = await renderMarkdownCore(markdown);
   const body = [
     renderRankingHighlight(rankings),
     renderOwnStore(ownStore),
     renderPricing(pricing),
     renderBreakfast(breakfast),
-    renderMarkdownCore(markdown),
+    markdownHtml,
   ].filter(Boolean).join('\n');
 
   return `<!DOCTYPE html>
