@@ -61,6 +61,29 @@ router.put('/competitors/:id', async (req, res) => {
   }
 });
 
+// GET /api/settings/internal-data — operator-uploaded CFA internal (CEM) ranks
+router.get('/internal-data', async (req, res) => {
+  try {
+    const row = await all("SELECT value FROM settings WHERE key = 'internal_metrics'");
+    res.json(row[0] ? JSON.parse(row[0].value) : []);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PUT /api/settings/internal-data — body: [{category,rank,of,percentile,note}]
+// These become the authoritative "measured" ranks for Jack's store, overriding
+// the inferred public-review ranks for matching categories on the next refresh.
+router.put('/internal-data', async (req, res) => {
+  try {
+    const metrics = Array.isArray(req.body) ? req.body : (req.body?.metrics || []);
+    await run('INSERT OR REPLACE INTO settings (key, value) VALUES (?, ?)', ['internal_metrics', JSON.stringify(metrics)]);
+    res.json({ ok: true, count: metrics.length });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 // GET /api/settings/prices — operator-seeded competitor prices
 router.get('/prices', async (req, res) => {
   try {
