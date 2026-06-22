@@ -145,7 +145,7 @@ router.get('/preview', async (req, res) => {
     const brief = await one('SELECT * FROM briefs ORDER BY created_at DESC LIMIT 1');
     if (!brief) return res.status(404).send('No brief yet — generate one first.');
     const extras = brief.extras ? JSON.parse(brief.extras) : {};
-    const html = renderBriefEmail({ location: brief.location, dateLabel: dateLabel(), markdown: brief.content, ...extras });
+    const html = await renderBriefEmail({ location: brief.location, dateLabel: dateLabel(), markdown: brief.content, ...extras });
     res.set('Content-Type', 'text/html').send(html);
   } catch (err) {
     res.status(500).send(err.message);
