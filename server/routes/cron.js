@@ -101,7 +101,7 @@ async function runWeekly({ force = false, send = true } = {}) {
     await run("INSERT INTO snapshots (kind, payload) VALUES ('ratings', ?)", [ratingsSnapshot]);
 
     // Render + send the email.
-    const html = renderBriefEmail({ location, dateLabel: dateLabel(), markdown, ...extras });
+    const html = await renderBriefEmail({ location, dateLabel: dateLabel(), markdown, ...extras });
     let emailResult = { sent: false, skipped: 'send=false' };
     if (send) {
       emailResult = await sendBriefEmail({ html, subject: `Your Weekly Market Brief — ${location.split(',')[0]}` });
