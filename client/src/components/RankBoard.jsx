@@ -13,15 +13,53 @@ function medal(rank) {
   return rank === 1 ? '🥇' : rank === 2 ? '🥈' : rank === 3 ? '🥉' : null;
 }
 
-export default function RankBoard({ rankings }) {
-  if (!rankings || !Array.isArray(rankings.categories) || !rankings.categories.length) return null;
+function RefreshBtn({ onRefresh, status, label }) {
+  if (!onRefresh) return null;
+  const running = status?.running;
+  return (
+    <button
+      onClick={onRefresh}
+      disabled={running}
+      className="text-xs font-semibold px-3 py-1.5 rounded-lg bg-white/15 hover:bg-white/25 disabled:opacity-60 text-white transition-colors whitespace-nowrap"
+    >
+      {running ? 'Working…' : label}
+    </button>
+  );
+}
+
+export default function RankBoard({ rankings, onRefresh, status, updatedAt }) {
+  const has = rankings && Array.isArray(rankings.categories) && rankings.categories.length;
+
+  // Empty state — invite the operator to run the ranking.
+  if (!has) {
+    return (
+      <section className="rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden mb-5">
+        <div className="bg-gradient-to-r from-cfa-red to-cfa-redDark px-6 py-5 text-white flex items-center justify-between gap-4">
+          <div>
+            <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/80">You vs nearby Chick-fil-As</p>
+            <h2 className="text-xl font-bold mt-0.5">See how you rank against the 24 closest CFAs</h2>
+          </div>
+          <RefreshBtn onRefresh={onRefresh} status={status} label="Run ranking" />
+        </div>
+        <div className="px-6 py-5 text-sm text-stone-500">
+          {status?.running
+            ? <span className="text-stone-700">{status.message || 'Pulling reviews and scoring…'}</span>
+            : 'Rank your store on overall rating, recent review volume, speed, accuracy, taste, and team courtesy — against the nearest Chick-fil-A locations.'}
+        </div>
+      </section>
+    );
+  }
+
   const total = rankings.totalStores || 25;
 
   return (
     <section className="rounded-2xl border border-stone-200 bg-white shadow-sm overflow-hidden mb-5">
-      <div className="bg-gradient-to-r from-cfa-red to-cfa-redDark px-6 py-5 text-white">
-        <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/80">You vs nearby Chick-fil-As</p>
-        <h2 className="text-xl font-bold mt-0.5">Ranked against the {total - 1} closest CFAs</h2>
+      <div className="bg-gradient-to-r from-cfa-red to-cfa-redDark px-6 py-5 text-white flex items-start justify-between gap-4">
+        <div>
+          <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-white/80">You vs nearby Chick-fil-As</p>
+          <h2 className="text-xl font-bold mt-0.5">Ranked against the {total - 1} closest CFAs</h2>
+        </div>
+        <RefreshBtn onRefresh={onRefresh} status={status} label="Refresh" />
       </div>
 
       <div className="px-6 py-5 space-y-4">
