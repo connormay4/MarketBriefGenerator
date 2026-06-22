@@ -144,8 +144,9 @@ function renderBreakfast(breakfast) {
     <tr><td style="padding:4px 28px 4px 28px;">${cards}</td></tr>`;
 }
 
-function renderMarkdownCore(markdown) {
+async function renderMarkdownCore(markdown) {
   if (!markdown) return '';
+  const marked = await getMarked();
   // Strip the "## SECTION N —" prefixes for cleaner email headings.
   const cleaned = markdown.replace(/^##\s*SECTION\s*\d+\s*[—-]\s*/gim, '## ');
   const html = marked.parse(cleaned);
