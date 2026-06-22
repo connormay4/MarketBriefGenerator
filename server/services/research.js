@@ -218,12 +218,12 @@ async function runResearchPipeline({ competitors, location, sections, emit = () 
     newsData[competitors[i]] = result.status === 'fulfilled' ? result.value : '(news unavailable)';
   });
 
-  emit(res, 'progress', { step: 'news', status: 'done', message: 'News search complete' });
-  emit(res, 'progress', { step: 'synthesis', status: 'running', message: 'Gemini is writing your brief...' });
+  emit('progress', { step: 'news', status: 'done', message: 'News search complete' });
+  emit('progress', { step: 'synthesis', status: 'running', message: 'Gemini is writing your brief...' });
 
   const brief = await synthesizeBrief({ competitorData, newsData, location, sections });
 
-  emit(res, 'progress', { step: 'synthesis', status: 'done', message: 'Brief complete' });
+  emit('progress', { step: 'synthesis', status: 'done', message: 'Brief complete' });
 
   return { brief, competitorData };
 }
