@@ -61,6 +61,26 @@ router.put('/competitors/:id', async (req, res) => {
   }
 });
 
+// GET /api/settings/prices — operator-seeded competitor prices
+router.get('/prices', async (req, res) => {
+  try {
+    res.json(await getPrices());
+  } catch (err) {
+    console.error('[settings] prices get failed:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// PUT /api/settings/prices — upsert one price (operator entry)
+router.put('/prices', async (req, res) => {
+  try {
+    const saved = await upsertPrice(req.body || {});
+    res.json({ ok: true, saved });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
 // DELETE /api/settings/competitors/:id
 router.delete('/competitors/:id', async (req, res) => {
   try {
