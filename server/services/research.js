@@ -156,7 +156,7 @@ async function synthesizeBrief({ competitorData, newsData, location, sections })
   console.log(`[synthesis] prompt ~${tokenEstimate} tokens`);
 
   const response = await withRetry(() => getClient().models.generateContent({
-    model: MODEL,
+    model: SYNTHESIS_MODEL,
     contents: prompt,
     // No output token cap — let the model write the full brief unconstrained.
     // Small thinking budget: enough internal reasoning to keep the
