@@ -62,6 +62,26 @@ router.put('/competitors/:id', async (req, res) => {
   }
 });
 
+// POST /api/settings/test-email — send a test email to EMAIL_TO (or ?to=)
+router.post('/test-email', async (req, res) => {
+  try {
+    const result = await sendTestEmail({ to: req.body?.to });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// POST /api/settings/prices/research — AI-research local competitor prices
+router.post('/prices/research', async (req, res) => {
+  try {
+    const updated = await researchAllPrices({ location: req.body?.location, overwriteOperator: !!req.body?.overwriteOperator });
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // GET /api/settings/internal-data — operator-uploaded CFA internal (CEM) ranks
 router.get('/internal-data', async (req, res) => {
   try {
