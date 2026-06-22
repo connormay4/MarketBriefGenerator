@@ -1,7 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const { all, run } = require('../db');
-const { getPrices, upsertPrice } = require('../services/pricing');
+const { getPrices, upsertPrice, researchAllPrices } = require('../services/pricing');
+const { sendTestEmail } = require('../services/email');
 
 // GET /api/settings
 router.get('/', async (req, res) => {
