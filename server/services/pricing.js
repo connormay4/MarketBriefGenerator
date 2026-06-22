@@ -1,4 +1,5 @@
 const { all, one, run } = require('../db');
+const { getClient, withRetry, parseJSON, MODELS } = require('./gemini');
 
 // ─── Competitor signature items ───────────────────────────────────────────────
 // Jack wants each competitor's chicken-sandwich price, OR their #1 meal if they
