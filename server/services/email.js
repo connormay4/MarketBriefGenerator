@@ -217,4 +217,19 @@ async function sendBriefEmail({ html, subject, to, from } = {}) {
   return { sent: true, id: data?.id, to: recipient, from: sender };
 }
 
-module.exports = { renderBriefEmail, sendBriefEmail };
+// A tiny test email to confirm Resend key + sender + recipient work, without
+// running the full brief pipeline. Used by Settings → "Send test email".
+async function sendTestEmail({ to } = {}) {
+  const html = `<div style="font-family:-apple-system,'Segoe UI',Arial,sans-serif;max-width:480px;margin:24px auto;">
+    <div style="background:${C.red};color:#fff;padding:18px 22px;border-radius:12px;">
+      <div style="font-weight:800;font-size:18px;">CFA Market Intel</div>
+      <div style="opacity:.85;font-size:13px;">Test email</div>
+    </div>
+    <p style="color:#333;font-size:14px;line-height:1.55;margin-top:18px;">
+      ✅ If you're reading this, your Resend key, sender, and recipient are all working —
+      your weekly brief will arrive exactly the same way.</p>
+    <p style="color:#aaa;font-size:12px;">Sent ${new Date().toISOString()}</p></div>`;
+  return sendBriefEmail({ html, subject: 'CFA Market Intel — test email', to });
+}
+
+module.exports = { renderBriefEmail, sendBriefEmail, sendTestEmail };
