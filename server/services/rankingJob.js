@@ -84,7 +84,12 @@ async function refreshRanking({ location, onProgress = () => {}, storeConcurrenc
   onProgress('Scoring and ranking…');
   const reviewsByPlace = await loadReviewsByPlace(stores.map(s => s.placeId));
   const source = usingOutscraper() ? 'outscraper' : 'places';
-  const snapshot = computeRanking({ locations: stores, reviewsByPlace, source });
+
+  // Optional operator-uploaded CFA internal metrics override (measured signal).
+  const imRow = await one("SELECT value FROM settings WHERE key = 'internal_metrics'");
+  const internalMetrics = imRow ? (() => { try { return JSON.parse(imRow.value); } catch { return []; } })() : [];
+
+  const snapshot = computeRanking({ locations: stores, reviewsByPlace, source, internalMetrics });
 
   await run("INSERT INTO snapshots (kind, payload) VALUES ('ranking', ?)", [JSON.stringify(snapshot)]);
   onProgress('Ranking complete.');
