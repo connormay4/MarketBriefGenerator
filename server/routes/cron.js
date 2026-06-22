@@ -3,6 +3,7 @@ const router = express.Router();
 const { all, one, run } = require('../db');
 const { assembleBrief } = require('../services/brief');
 const { renderBriefEmail, sendBriefEmail } = require('../services/email');
+const { refreshRanking } = require('../services/rankingJob');
 
 // ─── Auth ─────────────────────────────────────────────────────────────────────
 // Vercel Cron calls this endpoint with `Authorization: Bearer <CRON_SECRET>`.
