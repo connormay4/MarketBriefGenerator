@@ -46,7 +46,7 @@ let _client = null;
 let _ready = null;
 
 function rawClient() {
-  if (!_client) _client = createClient(resolveConfig());
+  if (!_client) _client = makeClient(resolveConfig());
   return _client;
 }
 
