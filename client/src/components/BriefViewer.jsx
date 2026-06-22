@@ -75,7 +75,7 @@ export default function BriefViewer({ brief, createdAt, location, extras, rankin
       </div>
 
       {/* Structured sections (marquee first) */}
-      <RankBoard rankings={ex.rankings} />
+      <RankBoard rankings={liveRankings} onRefresh={onRefreshRanking} status={rankingStatus} updatedAt={rankingUpdatedAt} />
       <OwnStoreReviews ownStore={ex.ownStore} />
       <PriceTable pricing={ex.pricing} />
       <BreakfastHub breakfast={ex.breakfast} />
