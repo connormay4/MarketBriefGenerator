@@ -2,6 +2,20 @@
   "version": "0.0.1",
   "configurations": [
     {
+      "name": "cfa-dev",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["run", "dev"],
+      "cwd": "/Users/connormay/CompetitorResearch",
+      "port": 3000
+    },
+    {
+      "name": "email-preview",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "4599", "--directory", "/tmp"],
+      "cwd": "/Users/connormay/CompetitorResearch",
+      "port": 4599
+    },
+    {
       "name": "connection-brief-frontend",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],
