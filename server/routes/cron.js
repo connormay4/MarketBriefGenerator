@@ -152,5 +152,29 @@ router.get('/preview', async (req, res) => {
   }
 });
 
+// Send a tiny test email to confirm Resend key + sender + recipient all work,
+// WITHOUT running the heavy brief pipeline. ?to= overrides the recipient.
+async function testEmail(req, res) {
+  if (!authorized(req)) return res.status(401).json({ error: 'unauthorized' });
+  try {
+    const to = req.query.to || process.env.EMAIL_TO;
+    const html = `<div style="font-family:-apple-system,'Segoe UI',Arial,sans-serif;max-width:480px;margin:24px auto;">
+      <div style="background:#E4002B;color:#fff;padding:18px 22px;border-radius:12px;">
+        <div style="font-weight:800;font-size:18px;">CFA Market Intel</div>
+        <div style="opacity:.85;font-size:13px;">Test email</div>
+      </div>
+      <p style="color:#333;font-size:14px;line-height:1.55;margin-top:18px;">
+        ✅ If you're reading this, your Resend key, sender, and recipient are all working —
+        your weekly brief will arrive exactly the same way.</p>
+      <p style="color:#aaa;font-size:12px;">Sent ${new Date().toISOString()}</p></div>`;
+    const result = await sendBriefEmail({ html, subject: 'CFA Market Intel — test email', to });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+}
+router.get('/test-email', testEmail);
+router.post('/test-email', testEmail);
+
 module.exports = router;
 module.exports.runWeekly = runWeekly;
