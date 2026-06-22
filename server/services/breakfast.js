@@ -6,10 +6,22 @@ const { generateJSON, MODELS } = require('./gemini');
 // LTOs. Rewards he can give (free Minis, hash browns, entrée cards to top/lapsed
 // app guests), local marketing, community partnerships, and mobile-app offers.
 
+// The ACTUAL Chick-fil-A breakfast menu — rewards/offers must reference only
+// these real items with correct names and sizes. (Chick-n-Minis are a 4-count
+// or a catering tray — there is no 8-count.)
+const BREAKFAST_MENU = [
+  'Chick-fil-A Chicken Biscuit', 'Spicy Chicken Biscuit',
+  'Chick-n-Minis (4-count)', 'Chick-n-Minis Tray (catering)',
+  'Egg White Grill', 'Hash Brown Scramble Bowl', 'Hash Brown Scramble Burrito',
+  'Bacon, Egg & Cheese Biscuit', 'Sausage, Egg & Cheese Biscuit',
+  'Bacon, Egg & Cheese Muffin', 'Hash Browns', 'Greek Yogurt Parfait',
+  'Fruit Cup', 'English Muffin', 'Chick-fil-A breakfast coffee (Thrive Farmers)',
+];
+
 const ALLOWED = [
-  'Free reward items loaded to specific guests via the Chick-fil-A App (e.g., free 8-count Chick-n-Minis, free Hash Browns, free Chicken Biscuit) — targeted to top customers, lapsed breakfast guests, or new app members',
+  'Free reward items loaded to specific guests via the Chick-fil-A App (e.g., a free Chicken Biscuit, free Hash Browns, free Chick-n-Minis (4-count), or free Egg White Grill) — targeted to top customers, lapsed breakfast guests, or new app members',
   'Mobile-order push / app Spotlight offers for the breakfast daypart',
-  'Local community partnerships: schools, offices, gyms, churches, hospitals — breakfast drop-offs, sampling, or catering for AM meetings',
+  'Local community partnerships: schools, offices, gyms, churches, hospitals — breakfast drop-offs, sampling, or catering (e.g. Chick-n-Minis Trays) for AM meetings',
   'Spirit nights / morning fundraisers and early-bird events',
   'In-store and drive-thru signage, lobby sampling, team-member suggestive selling for breakfast',
   'Targeted win-back of guests who used to visit at breakfast but stopped',
