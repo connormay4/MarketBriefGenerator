@@ -60,6 +60,22 @@ export async function deleteCompetitor(id) {
   return res.json();
 }
 
+export async function getPrices() {
+  const res = await fetch(`${BASE}/settings/prices`);
+  if (!res.ok) throw new Error('Failed to load prices');
+  return res.json();
+}
+
+export async function savePrice(data) {
+  const res = await fetch(`${BASE}/settings/prices`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error('Failed to save price');
+  return res.json();
+}
+
 // Returns an EventSource-compatible reader; calls onProgress(event) and onComplete({id, brief})
 export function generateBrief({ onProgress, onComplete, onError }) {
   const controller = new AbortController();
