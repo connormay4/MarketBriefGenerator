@@ -183,6 +183,10 @@ export default function App() {
             createdAt={activeBrief.created_at}
             location={activeBrief.location}
             extras={activeBrief.extras}
+            rankings={rankings}
+            onRefreshRanking={handleRefreshRanking}
+            rankingStatus={rankingStatus}
+            rankingUpdatedAt={rankingUpdatedAt}
           />
         )}
       </main>
