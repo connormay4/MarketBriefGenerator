@@ -157,6 +157,7 @@ export default function App() {
             brief={activeBrief.content}
             createdAt={activeBrief.created_at}
             location={activeBrief.location}
+            extras={activeBrief.extras}
           />
         )}
       </main>
