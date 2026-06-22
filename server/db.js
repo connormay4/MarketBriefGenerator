@@ -34,9 +34,12 @@ function resolveConfig() {
   }
   // No Turso configured → local file. On Vercel /tmp is the only writable dir
   // (ephemeral); production is expected to set TURSO_DATABASE_URL.
-  const dir =
-    process.env.DATA_DIR ||
-    (process.env.VERCEL ? '/tmp' : path.join(__dirname, '..', 'data'));
+  // On Vercel there is no usable local DB (filesystem is read-only/ephemeral and
+  // the native client doesn't bundle) — require Turso and say so clearly.
+  if (process.env.VERCEL) {
+    throw new Error('TURSO_DATABASE_URL is not set. Create a Turso database and add TURSO_DATABASE_URL (+ TURSO_AUTH_TOKEN) in Vercel → Settings → Environment Variables, then redeploy.');
+  }
+  const dir = process.env.DATA_DIR || path.join(__dirname, '..', 'data');
   // libSQL won't create a missing parent dir for a file: URL — do it ourselves.
   fs.mkdirSync(dir, { recursive: true });
   return { url: `file:${path.join(dir, 'briefs.db')}` };
