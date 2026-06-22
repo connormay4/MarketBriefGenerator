@@ -45,6 +45,10 @@ ${ALLOWED.map((a, i) => `- ${a}`).join('\n')}
 NEVER suggest (these are impossible for an operator):
 ${FORBIDDEN.map(f => `- ${f}`).join('\n')}
 
+ACCURACY: any food or reward you mention MUST be a REAL Chick-fil-A breakfast item, named correctly. The real breakfast menu is:
+${BREAKFAST_MENU.join(', ')}.
+Do NOT invent items, sizes, bundles, or counts. For example, Chick-n-Minis come as a 4-count or a catering tray — there is NO "8-count". When in doubt, use a free Chicken Biscuit, Hash Browns, or Chick-n-Minis (4-count).
+
 Each idea must tie a concrete reward or local-marketing lever to a clear goal (drive breakfast trial, win back lapsed AM guests, or grow mobile breakfast orders). Be specific and practical — name the reward, the audience, and the steps. Keep it grounded in what one store can do in a week.${context ? `\n\nLocal context to consider: ${context}` : ''}
 
 Return JSON of this exact shape:
