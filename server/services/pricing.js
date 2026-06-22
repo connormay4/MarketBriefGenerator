@@ -85,4 +85,55 @@ async function getPrice(competitor) {
   return p || null;
 }
 
-module.exports = { getPrices, upsertPrice, getPrice, formatPrice, DEFAULT_ITEMS, STALE_AFTER_DAYS };
+// ─── AI price research (Gemini + Google Search grounding) ─────────────────────
+// Local fast-food prices vary by store and aren't in any clean API, so we use a
+// web-grounded model and return an explicit confidence (high/medium/low). It
+// NEVER fabricates a precise number — unknown ⇒ null price, low confidence.
+async function researchPrice({ competitor, itemLabel, location }) {
+  const prompt = `Use Google Search to find the CURRENT dine-in price (US dollars) of "${itemLabel}" at ${competitor} near ${location}.
+Respond with ONLY a JSON object and no other text:
+{"priceUsd": <number or null>, "confidence": "high" | "medium" | "low", "note": "<short reason/source>"}
+Confidence guide:
+- "high": a specific, recent price for this item at a ${competitor} in or very near ${location} (official site/app for that store, or a current local menu).
+- "medium": a regional or slightly dated price, or a close proxy item.
+- "low": only a rough national estimate, or you are unsure.
+Never fabricate a precise number. If you cannot find a credible price, set priceUsd to null and confidence to "low".`;
+
+  const res = await withRetry(() => getClient().models.generateContent({
+    model: MODELS.grounding,
+    contents: prompt,
+    config: { tools: [{ googleSearch: {} }], thinkingConfig: { thinkingBudget: 0 } },
+  }), `price:${competitor}`);
+
+  const data = parseJSON(res.text ?? '');
+  const confidence = ['high', 'medium', 'low'].includes(data.confidence) ? data.confidence : 'low';
+  const priceCents = (typeof data.priceUsd === 'number' && isFinite(data.priceUsd) && data.priceUsd > 0)
+    ? Math.round(data.priceUsd * 100) : null;
+  return { priceCents, confidence, note: data.note || null };
+}
+
+// Research every active competitor's price. Skips operator-verified prices by
+// default (operator entry is the source of truth). Returns the refreshed list.
+async function researchAllPrices({ location, overwriteOperator = false } = {}) {
+  if (!location) {
+    const row = await one("SELECT value FROM settings WHERE key = 'location'");
+    location = row?.value || process.env.LOCATION || 'Hanover, PA 17331';
+  }
+  const current = await getPrices();
+  for (const p of current) {
+    if (!overwriteOperator && p.source === 'operator') continue;
+    try {
+      const r = await researchPrice({ competitor: p.competitor, itemLabel: p.itemLabel, location });
+      await upsertPrice({
+        competitor: p.competitor, itemLabel: p.itemLabel,
+        priceCents: r.priceCents, source: 'llm', confidence: r.confidence,
+        notes: r.note || (r.priceCents == null ? 'No reliable local price found' : null),
+      });
+    } catch (err) {
+      console.warn(`[pricing] research failed for ${p.competitor}:`, err.message);
+    }
+  }
+  return getPrices();
+}
+
+module.exports = { getPrices, upsertPrice, getPrice, researchPrice, researchAllPrices, formatPrice, DEFAULT_ITEMS, STALE_AFTER_DAYS };
