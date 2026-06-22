@@ -1,5 +1,13 @@
 const { Resend } = require('resend');
-const { marked } = require('marked');
+
+// `marked` is an ESM-only package. require()-ing it crashes Vercel's CommonJS
+// function runtime (ERR_REQUIRE_ESM) — which took down the whole API. Load it
+// lazily via dynamic import(), which works from CommonJS on every Node version.
+let _markedPromise;
+function getMarked() {
+  if (!_markedPromise) _markedPromise = import('marked').then(m => m.marked);
+  return _markedPromise;
+}
 
 // ─── Brand tokens (email-safe; inline styles only) ────────────────────────────
 const C = {
