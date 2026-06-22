@@ -57,7 +57,7 @@ const ASPECT_LABELS = {
   courtesy: 'Courteous team',
 };
 
-function computeRanking({ locations, reviewsByPlace, minMentions = 8, minRatingCount = 25, source = 'places' } = {}) {
+function computeRanking({ locations, reviewsByPlace, minMentions = 8, minRatingCount = 25, source = 'places', internalMetrics = [] } = {}) {
   const self = locations.find(l => l.isSelf);
   const reviewsFor = id => reviewsByPlace.get(id) || reviewsByPlace[id] || [];
 
