@@ -99,6 +99,38 @@ async function initSchema(db) {
       kind       TEXT NOT NULL,          -- 'ratings' | 'ranking'
       payload    TEXT NOT NULL
     );
+
+    -- The 25-CFA set: Jack's store (is_self=1) + the 24 nearest other CFAs.
+    CREATE TABLE IF NOT EXISTS cfa_locations (
+      place_id     TEXT PRIMARY KEY,
+      name         TEXT,
+      address      TEXT,
+      lat          REAL,
+      lng          REAL,
+      distance_m   REAL,
+      is_self      INTEGER NOT NULL DEFAULT 0,
+      rating       REAL,
+      review_count INTEGER,
+      updated_at   TEXT
+    );
+
+    -- Reviews pulled per location (Outscraper, or Places fallback). aspects is a
+    -- JSON array [{aspect, sentiment}] from LLM classification. UNIQUE(place_id,
+    -- review_uid) dedupes across incremental weekly pulls.
+    CREATE TABLE IF NOT EXISTS reviews (
+      id           INTEGER PRIMARY KEY AUTOINCREMENT,
+      place_id     TEXT NOT NULL,
+      review_uid   TEXT,
+      author       TEXT,
+      rating       INTEGER,
+      text         TEXT,
+      published_at TEXT,
+      aspects      TEXT,
+      source       TEXT,
+      fetched_at   TEXT NOT NULL DEFAULT (datetime('now')),
+      UNIQUE(place_id, review_uid)
+    );
+    CREATE INDEX IF NOT EXISTS idx_reviews_place ON reviews(place_id);
   `);
 
   // Per-brief structured side-data (pricing, own-store highlight, breakfast
