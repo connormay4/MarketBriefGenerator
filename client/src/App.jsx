@@ -14,6 +14,9 @@ export default function App() {
   const [showSettings, setShowSettings] = useState(false);
   const [error, setError] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [rankings, setRankings] = useState(null);
+  const [rankingUpdatedAt, setRankingUpdatedAt] = useState(null);
+  const [rankingStatus, setRankingStatus] = useState(null);
 
   const loadBriefs = useCallback(async () => {
     try {
@@ -24,9 +27,31 @@ export default function App() {
     }
   }, []);
 
+  const loadRanking = useCallback(async () => {
+    try {
+      const r = await getLatestRanking();
+      if (r) { setRankings(r); setRankingUpdatedAt(r.updatedAt || null); }
+    } catch { /* ranking is optional */ }
+  }, []);
+
   useEffect(() => {
     loadBriefs();
-  }, [loadBriefs]);
+    loadRanking();
+  }, [loadBriefs, loadRanking]);
+
+  function handleRefreshRanking() {
+    if (rankingStatus?.running) return;
+    setRankingStatus({ running: true, message: 'Starting…' });
+    refreshRanking({
+      onProgress: ({ message }) => setRankingStatus({ running: true, message }),
+      onComplete: (snapshot) => {
+        setRankings(snapshot);
+        setRankingUpdatedAt(new Date().toISOString());
+        setRankingStatus(null);
+      },
+      onError: (err) => setRankingStatus({ running: false, message: `Failed: ${err.message}` }),
+    });
+  }
 
   async function handleSelectBrief(id) {
     const brief = await getBrief(id);
