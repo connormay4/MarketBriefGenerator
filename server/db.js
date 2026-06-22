@@ -65,7 +65,50 @@ async function initSchema(db) {
       name TEXT NOT NULL UNIQUE,
       active INTEGER NOT NULL DEFAULT 1
     );
+
+    -- Operator-maintained price seed (source of truth). One row per competitor.
+    -- price_cents avoids float rounding; source/confidence/last_verified make
+    -- trust explicit so the brief never shows a fabricated price as fact.
+    CREATE TABLE IF NOT EXISTS competitor_prices (
+      competitor    TEXT PRIMARY KEY,
+      item_label    TEXT,
+      price_cents   INTEGER,
+      source        TEXT,                -- 'operator' | 'delivery' | 'llm'
+      confidence    TEXT,                -- 'high' | 'medium' | 'low'
+      last_verified TEXT,                -- ISO date (YYYY-MM-DD)
+      notes         TEXT
+    );
+
+    -- Cron idempotency + resumability. run_key (e.g. '2026-W25') dedupes a week;
+    -- cursor holds JSON fan-out state so the heavy job can resume mid-run.
+    CREATE TABLE IF NOT EXISTS job_runs (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      job        TEXT NOT NULL,
+      run_key    TEXT NOT NULL UNIQUE,
+      status     TEXT NOT NULL,          -- 'running' | 'done' | 'error'
+      cursor     TEXT,
+      result     TEXT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      updated_at TEXT
+    );
+
+    -- Weekly metric snapshots for trend lines (ratings now; rankings in Phase 2).
+    CREATE TABLE IF NOT EXISTS snapshots (
+      id         INTEGER PRIMARY KEY AUTOINCREMENT,
+      created_at TEXT NOT NULL DEFAULT (datetime('now')),
+      kind       TEXT NOT NULL,          -- 'ratings' | 'ranking'
+      payload    TEXT NOT NULL
+    );
   `);
+
+  // Per-brief structured side-data (pricing, own-store highlight, breakfast
+  // ideas, rankings) lives in a JSON `extras` column so the web UI and the
+  // email render from the same source. Guarded ALTER for already-created DBs.
+  try {
+    await db.execute('ALTER TABLE briefs ADD COLUMN extras TEXT');
+  } catch (err) {
+    if (!/duplicate column/i.test(err.message)) throw err;
+  }
 
   const defaultCompetitors = [
     "McDonald's",
