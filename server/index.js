@@ -6,6 +6,7 @@ const fs = require('fs');
 const briefsRouter = require('./routes/briefs');
 const settingsRouter = require('./routes/settings');
 const cronRouter = require('./routes/cron');
+const rankingsRouter = require('./routes/rankings');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
