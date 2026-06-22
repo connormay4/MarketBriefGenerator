@@ -32,10 +32,6 @@ const SYNTHESIS_MODEL = process.env.GEMINI_SYNTHESIS_MODEL || 'gemini-2.5-flash'
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-function emit(res, event, data) {
-  res.write(`event: ${event}\ndata: ${JSON.stringify(data)}\n\n`);
-}
-
 function truncate(text, maxChars) {
   if (!text || text.length <= maxChars) return text;
   return text.slice(0, maxChars) + '…';
