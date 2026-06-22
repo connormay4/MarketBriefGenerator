@@ -77,4 +77,28 @@ async function fetchCompetitorData(name, location) {
   }
 }
 
-module.exports = { fetchCompetitorData };
+// Fetch a single place directly by its Place ID (used for Jack's own store when
+// STORE_PLACE_ID is configured — avoids a text-search guess).
+async function fetchPlaceById(placeId) {
+  const API_KEY = getApiKey();
+  const url = `${PLACES_BASE}/details/json?place_id=${encodeURIComponent(placeId)}&fields=name,rating,user_ratings_total,formatted_address,reviews&reviews_sort=newest&key=${API_KEY}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Places details HTTP ${res.status}`);
+  const data = await res.json();
+  if (data.status !== 'OK') {
+    throw new Error(`Places details: ${data.status}${data.error_message ? ' — ' + data.error_message : ''}`);
+  }
+  const r = data.result || {};
+  return {
+    name: r.name,
+    placeId,
+    address: r.formatted_address,
+    rating: r.rating ?? null,
+    reviewCount: r.user_ratings_total ?? null,
+    reviews: (r.reviews || []).slice(0, 5).map(rv => ({
+      text: rv.text, rating: rv.rating, time: rv.relative_time_description, author: rv.author_name,
+    })),
+  };
+}
+
+module.exports = { fetchCompetitorData, fetchPlaceById };
