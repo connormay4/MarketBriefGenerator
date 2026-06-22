@@ -17,9 +17,18 @@ function getClient() {
   return _ai;
 }
 
-// Single source of truth for the Gemini model used across the pipeline.
-// If the API rejects this ID, try 'gemini-flash-latest' or 'gemini-2.5-flash'.
-const MODEL = 'gemini-3.5-flash';
+// Models are chosen per task for cost, and pinned by exact ID so a provider
+// never silently routes us to a pricier tier. All three IDs are confirmed
+// available on the configured key (see README → AI models). Override via env
+// if the API ever rejects an ID.
+//   • GROUNDING_MODEL — competitor news with Google Search grounding. Gemini 3
+//     Flash includes a free grounded-prompt quota, so at this volume it's ~$0.
+//   • SYNTHESIS_MODEL — final brief prose. 2.5 Flash is the cheapest competent
+//     writer here ($0.30/$2.50 per 1M vs gemini-3.5-flash's $1.50/$9.00).
+// NOTE: the previous single MODEL='gemini-3.5-flash' was a valid ID but the
+// 3x-pricier model — used for BOTH steps. We split it to control cost.
+const GROUNDING_MODEL = process.env.GEMINI_GROUNDING_MODEL || 'gemini-3-flash-preview';
+const SYNTHESIS_MODEL = process.env.GEMINI_SYNTHESIS_MODEL || 'gemini-2.5-flash';
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
