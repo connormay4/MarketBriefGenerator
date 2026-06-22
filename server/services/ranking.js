@@ -93,10 +93,28 @@ function computeRanking({ locations, reviewsByPlace, minMentions = 8, minRatingC
     categories.push({ key: aspect, label: ASPECT_LABELS[aspect], ...rankStores(entries) });
   }
 
+  // Merge any operator-supplied CFA INTERNAL metrics (CEM/OSAT) as the
+  // authoritative "measured" signal for HIS store, alongside the inferred
+  // public-review ranks. Keyed by category key (e.g. 'speed').
+  const byCat = Object.fromEntries((internalMetrics || []).map(m => [m.category, m]));
+  for (const c of categories) {
+    const m = byCat[c.key];
+    if (m && (m.rank != null || m.percentile != null)) {
+      c.measured = {
+        rank: m.rank != null ? Number(m.rank) : null,
+        of: m.of != null ? Number(m.of) : null,
+        percentile: m.percentile != null ? Number(m.percentile) : null,
+        note: m.note || null,
+      };
+    }
+  }
+
   const usingFallback = source !== 'outscraper';
-  const note = usingFallback
+  const hasMeasured = categories.some(c => c.measured);
+  let note = usingFallback
     ? 'Based on a small sample of public Google reviews (5/store) — directional only. Connect a reviews source for fuller, more confident ranks.'
     : 'Inferred from public Google reviews over the last 90 days — directional, not audited.';
+  if (hasMeasured) note += ' “Measured” ranks come from your uploaded CFA internal data and supersede the inferred ones.';
 
   return {
     totalStores: locations.length,
