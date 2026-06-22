@@ -79,6 +79,14 @@ async function runWeekly({ force = false, send = true } = {}) {
     const sections = sectionsRow ? JSON.parse(sectionsRow.value) : ['ratings', 'news', 'recommendations'];
     const competitors = (await all("SELECT name FROM competitors WHERE active = 1")).map(r => r.name);
 
+    // Refresh the 25-CFA ranking first so the brief picks up fresh ranks.
+    // Fault-isolated: a ranking failure must not block the weekly email.
+    try {
+      await refreshRanking({ location });
+    } catch (err) {
+      console.warn('[cron] ranking refresh failed (continuing without it):', err.message);
+    }
+
     const { markdown, competitorData, extras } = await assembleBrief({ competitors, location, sections });
 
     // Persist the brief.
