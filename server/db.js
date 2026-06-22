@@ -1,6 +1,21 @@
-const { createClient } = require('@libsql/client');
 const path = require('path');
 const fs = require('fs');
+
+// Pick the right libSQL client and require it LAZILY:
+//  • Remote Turso (libsql://, https://, wss://) → the pure-JS `/web` entry. It
+//    has NO native binary, so it loads cleanly in a Vercel serverless function
+//    (the native `@libsql/client` entry crashes there because Vercel's bundler
+//    often fails to include the platform `.node` file → FUNCTION_INVOCATION_FAILED).
+//  • Local file: DB (dev) → the native node entry (needed to open a file).
+// Requiring lazily also means importing this module never loads native code, so
+// /api/health and other non-DB routes work even before the DB is configured.
+function makeClient(config) {
+  const remote = /^(libsql|https?|wss?):/i.test(config.url);
+  const { createClient } = remote
+    ? require('@libsql/client/web')
+    : require('@libsql/client');
+  return createClient(config);
+}
 
 // ─── Connection ──────────────────────────────────────────────────────────────
 // We use libSQL (@libsql/client), which speaks BOTH a hosted Turso database and
