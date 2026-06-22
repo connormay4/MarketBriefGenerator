@@ -199,13 +199,13 @@ async function runResearchPipeline({ competitors, location, sections, emit = () 
       ? result.value
       : { name, error: result.reason?.message ?? 'unknown error', rating: null, reviewCount: null, reviews: [] };
     if (data.error) {
-      emit(res, 'progress', { step: 'ratings', status: 'running', message: `⚠️ ${name}: ${data.error}` });
+      emit('progress', { step: 'ratings', status: 'running', message: `⚠️ ${name}: ${data.error}` });
     }
     return data;
   });
 
   const successCount = competitorData.filter(c => c.rating !== null).length;
-  emit(res, 'progress', {
+  emit('progress', {
     step: 'ratings', status: 'done',
     message: successCount === competitorData.length
       ? `Ratings fetched for all ${successCount} competitors`
