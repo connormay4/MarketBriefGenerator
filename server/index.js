@@ -15,6 +15,7 @@ app.use(express.json());
 
 app.use('/api/briefs', briefsRouter);
 app.use('/api/settings', settingsRouter);
+app.use('/api/cron', cronRouter);
 
 // Health check
 app.get('/api/health', (req, res) => res.json({ ok: true }));
