@@ -26,7 +26,8 @@ router.get('/:id', async (req, res) => {
     if (!brief) return res.status(404).json({ error: 'Brief not found' });
     res.json({
       ...brief,
-      ratings_snapshot: JSON.parse(brief.ratings_snapshot)
+      ratings_snapshot: JSON.parse(brief.ratings_snapshot),
+      extras: brief.extras ? JSON.parse(brief.extras) : null,
     });
   } catch (err) {
     console.error('[briefs] get failed:', err);
