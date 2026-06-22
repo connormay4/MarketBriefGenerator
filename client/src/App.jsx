@@ -3,7 +3,7 @@ import Sidebar from './components/Sidebar';
 import BriefViewer from './components/BriefViewer';
 import ProgressTracker from './components/ProgressTracker';
 import SettingsPanel from './components/SettingsPanel';
-import { getBriefs, getBrief, generateBrief } from './lib/api';
+import { getBriefs, getBrief, generateBrief, getLatestRanking, refreshRanking } from './lib/api';
 
 export default function App() {
   const [briefs, setBriefs] = useState([]);
