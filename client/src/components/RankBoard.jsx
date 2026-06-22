@@ -64,17 +64,23 @@ export default function RankBoard({ rankings, onRefresh, status, updatedAt }) {
 
       <div className="px-6 py-5 space-y-4">
         {rankings.categories.map((cat, i) => {
-          const ranked = cat.rankedOf || total;
-          const insufficient = cat.rank == null;
-          const pct = insufficient ? 0 : 100 * (1 - (cat.rank - 1) / Math.max(1, ranked - 1));
-          const { bar, text } = rankColor(cat.rank, ranked);
+          // A "measured" CFA-internal rank supersedes the inferred one.
+          const measured = cat.measured && cat.measured.rank != null ? cat.measured : null;
+          const dispRank = measured ? measured.rank : cat.rank;
+          const ranked = measured ? (measured.of || total) : (cat.rankedOf || total);
+          const insufficient = dispRank == null;
+          const pct = insufficient ? 0 : 100 * (1 - (dispRank - 1) / Math.max(1, ranked - 1));
+          const { bar, text } = rankColor(dispRank, ranked);
           return (
             <div key={i} className="grid grid-cols-[1fr_auto] gap-x-3 items-center">
               <div className="min-w-0">
                 <div className="flex items-baseline justify-between gap-2">
-                  <span className="text-sm font-semibold text-stone-800 truncate">{cat.label}</span>
+                  <span className="text-sm font-semibold text-stone-800 truncate">
+                    {cat.label}
+                    {measured && <span className="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-700 align-middle">MEASURED</span>}
+                  </span>
                   <span className={`text-sm font-bold ${text} whitespace-nowrap`}>
-                    {medal(cat.rank)} {insufficient ? 'Insufficient data' : `#${cat.rank} of ${ranked}`}
+                    {medal(dispRank)} {insufficient ? 'Insufficient data' : `#${dispRank} of ${ranked}`}
                   </span>
                 </div>
                 <div className="mt-1.5 h-2.5 rounded-full bg-stone-100 overflow-hidden">
