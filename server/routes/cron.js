@@ -203,3 +203,4 @@ router.post('/test-email', testEmail);
 
 module.exports = router;
 module.exports.runWeekly = runWeekly;
+module.exports.sendBriefEmailNow = sendBriefEmailNow;
