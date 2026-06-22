@@ -1,5 +1,52 @@
 import React, { useState, useEffect } from 'react';
-import { getSettings, saveSettings, addCompetitor, toggleCompetitor, deleteCompetitor } from '../lib/api';
+import { getSettings, saveSettings, addCompetitor, toggleCompetitor, deleteCompetitor, getPrices, savePrice } from '../lib/api';
+
+function PriceEditor() {
+  const [prices, setPrices] = useState(null);
+  const [savingFor, setSavingFor] = useState(null);
+
+  useEffect(() => { getPrices().then(setPrices).catch(() => setPrices([])); }, []);
+
+  async function handleSave(competitor, value) {
+    setSavingFor(competitor);
+    try {
+      await savePrice({ competitor, price: value });
+      setPrices(await getPrices());
+    } finally {
+      setSavingFor(null);
+    }
+  }
+
+  if (!prices) return <p className="text-xs text-stone-400">Loading prices…</p>;
+
+  return (
+    <div className="space-y-3">
+      {prices.map(p => (
+        <div key={p.competitor} className="flex items-center gap-2">
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-medium text-stone-700 truncate">{p.competitor}</div>
+            <div className="text-[11px] text-stone-400 truncate">{p.itemLabel}</div>
+          </div>
+          <div className="flex items-center gap-1">
+            <span className="text-stone-400 text-sm">$</span>
+            <input
+              type="text"
+              defaultValue={p.priceCents != null ? (p.priceCents / 100).toFixed(2) : ''}
+              placeholder="0.00"
+              onBlur={e => {
+                const v = e.target.value.trim();
+                if (v && v !== (p.priceCents != null ? (p.priceCents / 100).toFixed(2) : '')) handleSave(p.competitor, v);
+              }}
+              className="w-20 border border-stone-300 rounded-md px-2 py-1 text-sm text-right focus:outline-none focus:ring-2 focus:ring-cfa-red"
+            />
+          </div>
+          <span className="w-10 text-[10px] text-stone-400 text-right">{savingFor === p.competitor ? '…' : p.lastVerified ? '✓' : ''}</span>
+        </div>
+      ))}
+      <p className="text-[11px] text-stone-400">Enter the local Hanover price you’ve verified. Saved on blur and stamped with today’s date.</p>
+    </div>
+  );
+}
 
 const ALL_SECTIONS = [
   { key: 'ratings', label: 'Ratings Landscape' },
