@@ -66,8 +66,22 @@ function dateLabel() {
   });
 }
 
+// ─── Kill switch ──────────────────────────────────────────────────────────────
+// The weekly send is OFF. The `crons` entry is gone from vercel.json, but this
+// guard also stops any stray trigger — an older deployment still holding the
+// cron registration, or a manual hit on /api/cron/weekly. To turn the weekly
+// email back on: set WEEKLY_EMAIL_ENABLED=true AND restore the cron in
+// vercel.json ("crons": [{ "path": "/api/cron/weekly", "schedule": "0 13 * * 1" }]).
+function weeklyEnabled() {
+  return String(process.env.WEEKLY_EMAIL_ENABLED || '').toLowerCase() === 'true';
+}
+
 // ─── The weekly job ───────────────────────────────────────────────────────────
 async function runWeekly({ force = false, send = true } = {}) {
+  if (!weeklyEnabled()) {
+    console.warn('[cron] weekly job is disabled (WEEKLY_EMAIL_ENABLED is not "true") — nothing sent');
+    return { skipped: true, reason: 'disabled', hint: 'set WEEKLY_EMAIL_ENABLED=true to re-enable' };
+  }
   const runKey = isoWeekKey();
   const claim = await claimRun(runKey, force);
   if (!claim.ok) return { skipped: true, reason: claim.reason, runKey };
