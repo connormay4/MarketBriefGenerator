@@ -40,8 +40,8 @@ You need these accounts/keys. Add each to **Vercel → Project → Settings → 
 | **Google AI (Gemini)** | `GEMINI_API_KEY` | **Enable billing** on the key — the free tier's 250 requests/day can't sustain review classification. Usage is still pennies/week. |
 | **Google Places** | `GOOGLE_PLACES_API_KEY` | Enable **Places API (New)** (used for the 24-nearest-CFA discovery) and Places API. |
 | **Turso** (storage) | `TURSO_DATABASE_URL`, `TURSO_AUTH_TOKEN` | Free tier is plenty. `turso db create`, then `turso db show --url` and `turso db tokens create`. Omit locally to use a file DB. |
-| **Resend** (email) | `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_TO` | Free tier (3,000/mo). Verify a sending domain (SPF/DKIM/DMARC) for `EMAIL_FROM`; until then you can send from `onboarding@resend.dev`. `EMAIL_TO=jack.stefano@cfafranchisee.com`. |
-| **Cron secret** | `CRON_SECRET` | Any long random string. Vercel Cron sends it as `Authorization: Bearer …`; the endpoint rejects anything else. |
+| **Resend** (email) | `RESEND_API_KEY`, `EMAIL_FROM`, `EMAIL_TO` | Only used by the manual send / test-email buttons now. Free tier (3,000/mo). Verify a sending domain (SPF/DKIM/DMARC) for `EMAIL_FROM`; until then you can send from `onboarding@resend.dev`. |
+| **Cron secret** | `CRON_SECRET` | Any long random string. Guards `/api/cron/*`. Still worth setting even with the weekly job off. |
 | **Outscraper** (reviews) | `OUTSCRAPER_API_KEY` | **Optional but recommended (~$5/mo).** Without it, ranking falls back to Google's 5-reviews/place and aspect ranks show "Insufficient data." |
 | **Your store** | `STORE_PLACE_ID` | Optional. Jack's CFA Place ID to anchor discovery precisely. If unset, the nearest CFA to `LOCATION` is used. |
 | **Location** | `LOCATION` | `"Hanover, PA 17331"`. |
