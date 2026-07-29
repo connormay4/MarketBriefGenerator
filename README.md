@@ -10,7 +10,7 @@ An operator-grade competitive-intelligence tool for a Chick-fil-A franchise (bui
 - **Breakfast hub** — a few realistic, operator-executable ideas to grow the morning daypart (reward levers only — no menu/price changes).
 - **The brief** — ratings landscape, what's happening this week, and owner recommendations.
 
-Everything runs on **Vercel only** (no Railway): a static React front end + an Express API as one serverless function + a weekly Vercel Cron that emails the brief.
+Everything runs on **Vercel only** (no Railway): a static React front end + an Express API as one serverless function. (A weekly Vercel Cron used to email the brief; it is now disabled.)
 
 ---
 
