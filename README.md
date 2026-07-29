@@ -21,13 +21,13 @@ Browser ── Vercel ──┬─ /            → static React build (client/d
                     └─ /api/*       → Express function (api/index.js → server/index.js)
                          • /briefs/generate (SSE)  on-demand brief
                          • /rankings/refresh (SSE)  25-CFA ranking
-                         • /cron/weekly  ← Vercel Cron (Mon 13:00 UTC) + CRON_SECRET
+                         • /cron/weekly  ← DISABLED (no cron; gated off in code)
 Data: Turso (libSQL) · Email: Resend · Reviews: Outscraper (+ Places fallback) · LLM: Gemini
 ```
 
 - **Backend** = the Express app exported by `server/index.js`, re-exported at `api/index.js` and routed by `vercel.json`.
 - **Storage** = Turso (hosted libSQL). Locally it falls back to a `./data/briefs.db` file automatically — no Turso account needed for dev.
-- **Weekly job** = `vercel.json` cron → `/api/cron/weekly` (secured by `CRON_SECRET`, idempotent per ISO week) → refresh ranking → assemble brief → email via Resend.
+- **Weekly job** = **off.** No `crons` entry in `vercel.json`, and `runWeekly()` returns early unless `WEEKLY_EMAIL_ENABLED=true`. Hitting `/api/cron/weekly` is a no-op that sends nothing.
 
 ---
 
