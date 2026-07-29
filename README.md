@@ -1,6 +1,8 @@
 # CFA Market Intel — Weekly Competitive Brief
 
-An operator-grade competitive-intelligence tool for a Chick-fil-A franchise (built for **Hanover, PA 17331**). It generates a beautifully-designed brief on demand **and** emails it weekly, covering:
+> **⚠️ The weekly email is turned OFF.** The Vercel Cron entry has been removed from `vercel.json` and the job is additionally gated behind `WEEKLY_EMAIL_ENABLED`. Nothing sends on a schedule. On-demand brief generation and the manual "send" / "test email" buttons still work. See [Turning the weekly email back on](#turning-the-weekly-email-back-on).
+
+An operator-grade competitive-intelligence tool for a Chick-fil-A franchise (built for **Hanover, PA 17331**). It generates a beautifully-designed brief on demand (weekly emailing is currently disabled), covering:
 
 - **You vs nearby Chick-fil-As** — ranks your store against the **24 closest CFAs** on overall rating, recent review volume, and review-derived **speed, accuracy, taste, and courtesy** (e.g. "#2 of 23 on courteous team").
 - **Your store this week** — your Google rating, a notable praise, a notable concern, and one action prompt.
