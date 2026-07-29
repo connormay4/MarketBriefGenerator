@@ -133,5 +133,5 @@ To shut it down again: remove the `crons` block and unset `WEEKLY_EMAIL_ENABLED`
   /services            research · brief · pricing · breakfast · ownStore ·
                        email · discovery · reviews · classify · ranking · rankingJob · gemini
 /client                React + Vite + Tailwind front end
-vercel.json            build, /api routing, weekly cron, function maxDuration
+vercel.json            build, /api routing, function maxDuration (no cron — disabled)
 ```
