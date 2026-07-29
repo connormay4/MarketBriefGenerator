@@ -89,8 +89,26 @@ open  "http://localhost:3001/api/cron/preview?key=$CRON_SECRET"
 
 1. Import the repo in Vercel (root directory = repo root). The build command (`npm run build`) and output (`client/dist`) are set in `vercel.json`.
 2. Add all env vars from the checklist.
-3. Deploy. The weekly cron (`vercel.json` → `0 13 * * 1`, Mondays) is registered automatically.
-4. Verify: open the deployed URL, generate a brief, run the ranking; then trigger the weekly job once: `curl -X POST "https://<your-app>/api/cron/weekly?force=1&key=$CRON_SECRET"` and confirm the email arrives.
+3. Deploy. No cron is registered — nothing sends on a schedule.
+4. Verify: open the deployed URL, generate a brief, run the ranking.
+
+---
+
+## Turning the weekly email back on
+
+Both steps are required — either one alone sends nothing:
+
+1. Restore the cron in `vercel.json` and redeploy:
+   ```json
+   "crons": [
+     { "path": "/api/cron/weekly", "schedule": "0 13 * * 1" }
+   ]
+   ```
+2. Set `WEEKLY_EMAIL_ENABLED=true` in Vercel → Settings → Environment Variables, and confirm `RESEND_API_KEY` / `EMAIL_FROM` / `EMAIL_TO` are still set.
+
+Then smoke-test with `curl -X POST "https://<your-app>/api/cron/weekly?force=1&key=$CRON_SECRET"`.
+
+To shut it down again: remove the `crons` block and unset `WEEKLY_EMAIL_ENABLED`.
 
 ---
 
