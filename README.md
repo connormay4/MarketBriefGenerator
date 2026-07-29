@@ -77,7 +77,8 @@ npm run dev               # client on :3000 (proxies /api to :3001)
 
 Useful endpoints for testing:
 ```bash
-# Weekly job without sending email (force past the once-per-week lock):
+# Weekly job — now a no-op; returns {"skipped":true,"reason":"disabled"}.
+# Prefix with WEEKLY_EMAIL_ENABLED=true (and send=0) if you need to exercise it locally:
 curl -X POST "http://localhost:3001/api/cron/weekly?force=1&send=0&key=$CRON_SECRET"
 # Preview the rendered HTML email of the latest brief:
 open  "http://localhost:3001/api/cron/preview?key=$CRON_SECRET"
